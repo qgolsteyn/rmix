@@ -1,17 +1,21 @@
-(load lib/markdown.rem)
+(def (fib _) (+ (fib (- (#0) 1)) (fib (- (#0) 2))))
+(def (fib 1) 1)
+(def (fib 0) 0)
 
-(markdown
-    (h1 An example document)
+(def (fact _) (* (#0) (fact (- (#0) 1))))
+(def (fact 0) 1)
 
-    (p As cringe-worthy it is to look at these videos in hindsight, I am particularly proud of the work our small team of volunteers
-        made in 2016 to promote all the events happening in the engineering community at UBC.)
+(def (or T T) T)
+(def (or T F) T)
+(def (or F T) T)
+(def (or F F) F)
 
-    (p With a team of three volunteers, we produced one video a week promoting different events on campus. It was an amazing opportunity
-        for everyone to practice video production on a tigh timeline. 
-        I was also one of the main presenters on these videos, showcasing my lovely French accent to the whole community.)
-    (ol
-        (item We succesfully showed the world how to do stuff)
-        (item We didn't die)
-        (item We didn't mess up))
-        
-    (p Let's try to do better next time!))
+(def (and T T) T)
+(def (and T F) F)
+(def (and F T) F)
+(def (and F F) F)
+
+(def (not T) F)
+(def (not F) T)
+
+(not (or F (and T (not T))))

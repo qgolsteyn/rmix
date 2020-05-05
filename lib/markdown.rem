@@ -1,23 +1,29 @@
-(load lib/string.js)
-(load lib/fs.js)
+(def document
+    (def title (#))
+    (def author (#))
+    (def content (#))
+    (article
+        (h1 (# title))
+        (p (class subtitle) (# author))
+        (# content)))
 
+(def markdown 
+    (def h1 # (#) "\n\n")
+    (def h2 ## (#) "\n\n")
+    (def h3 ### (#) "\n\n")
+    (def h4 #### (#) "\n\n")
+    (def h5 ##### (#) "\n\n")
+    (def h6 ###### (#) "\n\n")
+    
+    (def p (#) "\n\n")
+    
+    (def ul
+        (def item "-" (#) "\n")
+        (#) "\n")
+    
+    (def ol 
+        (def item "1." (#) "\n")
+        (#) "\n")
 
-(def markdown (@ 
-    (def h1 (@ # (#) "\n\n"))
-    (def h2 (@ ## (#) "\n\n"))
-    (def h3 (@ ### (#) "\n\n"))
-    (def h4 (@ #### (#) "\n\n"))
-    (def h5 (@ ##### (#) "\n\n"))
-    (def h6 (@ ###### (#) "\n\n"))
-    
-    (def p (@ (#) "\n\n"))
-    
-    (def ul (@
-        (def item (@ "-" (#) "\n"))
-        (#) "\n"))
-    
-    (def ol (@
-        (def item (@ "1." (#) "\n"))
-        (#) "\n"))
+    (#))
 
-    (write example.md (string/join (#)))))

@@ -1,12 +1,14 @@
-import { createNode } from "./core/createNode";
-import { process } from "./core";
+import { remix } from "./core";
 
 export default async (args) => {
   console.time();
-  process(
-    createNode(undefined, ["_", ["load", "base.rem"]], {
-      input: () => createNode(undefined, [args.input]),
-    })
+  console.log(
+    JSON.stringify(
+      remix(["_", ["load", "base.rem"]], { input: () => ["_", args.input] }),
+      null,
+      2
+    )
   );
+
   console.timeEnd();
 };

@@ -85,6 +85,6 @@ export const load = (node, scope) => {
     }
     return ["_"];
   } else {
-    throw "Unknown extension";
+    throw `Unknown extension: ${node[1]}`;
   }
 };

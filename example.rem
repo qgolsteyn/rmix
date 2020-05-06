@@ -1,21 +1,5 @@
-(def (fib _) (+ (fib (- (#0) 1)) (fib (- (#0) 2))))
-(def (fib 1) 1)
-(def (fib 0) 0)
-
-(def (fact _) (* (#0) (fact (- (#0) 1))))
-(def (fact 0) 1)
-
-(def (or T T) T)
-(def (or T F) T)
-(def (or F T) T)
-(def (or F F) F)
-
-(def (and T T) T)
-(def (and T F) F)
-(def (and F T) F)
-(def (and F F) F)
-
-(def (not T) F)
-(def (not F) T)
-
-(not (or F (and T (not T))))
+(document
+    (title Remix)
+    (shortDescription is a small term-rewriting language based on JavaScript which aims to ease the creation of small
+        domain specific languages.)
+    (subtitle A term-rewriting language to help write small domain-specific languages.))

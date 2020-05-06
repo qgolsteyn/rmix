@@ -9,6 +9,5 @@ export default async (args) => {
       2
     )
   );
-
   console.timeEnd();
 };

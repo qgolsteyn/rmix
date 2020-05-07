@@ -21,23 +21,26 @@ const checkMatch = (node, pattern, scope = {}) => {
     }
   }
 
+  scope[`#${node[0]}`] = (_, scope) =>
+    process(["_", ...node.slice(pattern.length)], scope);
+
   return scope;
 };
 
-function applyDefinition(node, scope) {
-  for (const definition of this) {
+const applyDefinition = (definitions) => (node, scope) => {
+  for (const definition of definitions) {
     const argsScope = checkMatch(node, definition.pattern);
     if (argsScope) {
       const output = process(definition.output, { ...scope, ...argsScope });
 
       if (!definition.cached) {
-        this.unshift({ pattern: node, output, cached: true });
+        definitions.unshift({ pattern: node, output, cached: true });
       }
 
       return output;
     }
   }
-}
+};
 
 export const def = (node, scope) => {
   const pattern = node[1];
@@ -47,12 +50,15 @@ export const def = (node, scope) => {
 
   if (!scope[head]) {
     const definitions = [];
-    scope[head] = applyDefinition.bind(definitions);
+    scope[head] = applyDefinition(definitions);
     scope[head].definitions = definitions;
   }
 
-  const definitions = scope[head].definitions;
+  const definitions = [...scope[head].definitions];
   definitions.unshift({ pattern, output });
+
+  scope[head] = applyDefinition(definitions);
+  scope[head].definitions = definitions;
 
   return ["_"];
 };

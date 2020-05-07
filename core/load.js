@@ -1,85 +1,57 @@
+import * as proc from "process";
 import * as fs from "fs";
 import * as path from "path";
 
 import { process } from "./process";
 
-const parseRules = [
-  { type: "space", regex: /^\s/ },
-  { type: "lParen", regex: /^\(/ },
-  { type: "rParen", regex: /^\)/ },
-  { type: "number", regex: /^[0-9\.]+/ },
-  { type: "string", regex: /^".*?"/ },
-  { type: "variable", regex: /^[^\s\(\)]+/ },
-];
+export const load = (node, scope) => {
+  const dirname = scope.dirname ? scope.dirname(node, scope)[1] : proc.cwd();
 
-const tokenizer = (rules) => (input) => {
-  for (let i = 0; i < rules.length; i += 1) {
-    let tokenized = rules[i].regex.exec(input);
-    if (tokenized) {
-      return {
-        token: tokenized[0],
-        type: rules[i].type,
-        rest: input.slice(tokenized[0].length),
-      };
-    }
+  let filePath = "";
+  if (node[1].slice(0, 2) === "./" || node[1].slice(0, 3) === "../") {
+    filePath = path.resolve(dirname, node[1]);
+  } else if (node[1].slice(0, 1) === "/") {
+    filePath = path.resolve(node[1]);
+  } else {
+    filePath = path.resolve("node_modules", node[1]);
   }
 
-  throw new Error(`no matching tokenize rule for ${JSON.stringify(input)}`);
-};
-
-const parser = (tokenize) =>
-  function parse(input, ast, parents = []) {
-    if (input === "") {
-      return ast;
-    }
-
-    const { token, type, rest } = tokenize(input);
-
-    if (type === "space") {
-      // do nothing
-      return parse(rest, ast, parents);
-    } else if (type === "variable") {
-      ast.push(token);
-      return parse(rest, ast, parents);
-    } else if (type === "number") {
-      ast.push(Number(token));
-      return parse(rest, ast, parents);
-    } else if (type === "string") {
-      ast.push(token.replace(/(^"|"$)/g, "").replace(/\\n/g, "\n"));
-      return parse(rest, ast, parents);
-    } else if (type === "lParen") {
-      parents.push(ast);
-      return parse(rest, [], parents);
-    } else if (type === "rParen") {
-      const parentAst = parents.pop();
-      if (parentAst) {
-        parentAst.push(ast);
-        return parse(rest, parentAst, parents);
-      }
-
-      return parse(rest, ast, parents);
-    }
-
-    throw new Error(`Missing parse logic for rule ${JSON.stringify(type)}`);
-  };
-
-export const parse = (node, scope) =>
-  process(["_", ...parser(tokenizer(parseRules))(node)], scope);
-
-export const load = (node, scope) => {
   const extension = path.extname(node[1]);
+
   if (extension === ".rem") {
-    return process(
-      [
-        "_",
-        ...parser(tokenizer(parseRules))(
-          "(" + fs.readFileSync(node[1], "utf-8") + ")"
-        ),
-      ],
+    const oldDirname = scope.dirname;
+    const oldFilename = scope.filename;
+
+    scope.dirname = () => ["_", path.dirname(filePath)];
+    scope.filename = () => ["_", filePath];
+
+    const output = process(
+      ["parse", "(" + fs.readFileSync(filePath, "utf-8") + ")"],
       scope
     );
+
+    scope.dirname = oldDirname;
+    scope.filename = oldFilename;
+
+    return output;
+  } else if (extension === ".json") {
+    const oldDirname = scope.dirname;
+    const oldFilename = scope.filename;
+
+    scope.dirname = () => ["_", path.dirname(filePath)];
+    scope.filename = () => ["_", filePath];
+
+    const output = process(
+      ["parseJSON", fs.readFileSync(filePath, "utf-8")],
+      scope
+    );
+
+    scope.dirname = oldDirname;
+    scope.filename = oldFilename;
+
+    return output;
   } else if (extension === ".js") {
-    const lib = require("../" + node[1]).default;
+    const lib = require(filePath).default;
     for (const key of Object.keys(lib)) {
       scope[key] = lib[key];
     }

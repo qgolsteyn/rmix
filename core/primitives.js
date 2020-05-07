@@ -3,6 +3,10 @@ import { process } from "./process";
 
 export const primitives = {
   "#def": def,
+  "#undef": (node, scope) => {
+    delete scope[node[1]];
+    return ["_"];
+  },
   "#?": (node, scope) => {
     const cond = process(node[1], scope)[1];
     if (cond === "T") {

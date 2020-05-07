@@ -1,5 +1,0 @@
-(document
-    (title Remix)
-    (shortDescription is a small term-rewriting language based on JavaScript which aims to ease the creation of small
-        domain specific languages.)
-    (subtitle A term-rewriting language to help write small domain-specific languages.))

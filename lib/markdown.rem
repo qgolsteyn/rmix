@@ -1,9 +1,0 @@
-(def document
-    (def (title _) (#))
-    (def (author _) (#))
-    (def (content _) (#))
-    (article
-        (h1 (# title))
-        (p (class subtitle) (# author))
-        (# content)))
-

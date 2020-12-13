@@ -1,0 +1,7 @@
+(def mapNumber (+ (# 0) 1))
+
+(def lessThan3 (< (# 0) 3))
+
+(mapResult (map (data 1 2 3 4 5) (to mapNumber)))
+
+(filterResult (filter (data 1 2 3 4 5) (condition lessThan3)))

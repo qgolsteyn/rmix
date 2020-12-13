@@ -1,5 +1,3 @@
-import { process } from "./process";
-
 const parseRules = [
   { type: "space", regex: /^\s/ },
   { type: "lParen", regex: /^\(/ },
@@ -67,5 +65,6 @@ const parser = (tokenize) =>
     throw new Error(`Missing parse logic for rule ${JSON.stringify(type)}`);
   };
 
-export const parse = (node, scope) =>
-  process(["_", ...parser(tokenizer(parseRules))(node[1])], scope);
+export const parse = ([content]) => ({
+  node: ["_", ...parser(tokenizer(parseRules))(content)],
+});

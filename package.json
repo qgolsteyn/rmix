@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "author": "Quentin Golsteyn",
   "dependencies": {
-    "esm": "^3.2.25",
-    "yargs": "^15.3.1"
+    "esm": "^3.2.25"
   }
 }

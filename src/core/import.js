@@ -2,7 +2,7 @@ import * as proc from "process";
 import * as fs from "fs";
 import * as path from "path";
 
-export const load = ([filename], scope) => {
+export const importRemix = ([filename], scope) => {
   const dirname = scope.dirname ? scope.dirname.value : proc.cwd();
 
   let filePath = "";

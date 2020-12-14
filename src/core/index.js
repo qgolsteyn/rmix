@@ -2,7 +2,7 @@ import boolean from "./boolean";
 import conditional from "./conditional";
 import math from "./math";
 import { def } from "./def";
-import { load } from "./load";
+import { importRemix } from "./import";
 import { parse } from "./parse";
 import list from "./list";
 import { apply } from "./apply";
@@ -14,6 +14,6 @@ export default {
   ...conditional,
   ...boolean,
   ...math,
-  load: { map: load },
+  import: { map: importRemix },
   parse: { map: parse },
 };

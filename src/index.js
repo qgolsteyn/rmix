@@ -1,6 +1,9 @@
 import core from "./core";
-import { process } from "./process";
-import runtime from "./runtime";
+import process from "./process";
+import runtime from "./runtime/entrypoint";
 
 export const remix = (node, scope = {}) =>
-  process(["_", ...runtime, node], { ...core, ...scope }).node;
+  process(["_", ["defn", "entrypoint", node], ...runtime], {
+    ...core,
+    ...scope,
+  }).node;

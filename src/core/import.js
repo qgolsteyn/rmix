@@ -4,9 +4,7 @@ import * as path from "path";
 
 export const importRemix = {
   post: ([filename], scope) => {
-    const dirname = scope.dirname ? scope.dirname.value : proc.cwd();
-
-    console.log(filename);
+    const dirname = scope.dirname ? scope.dirname.post().node[1] : proc.cwd();
 
     let filePath = "";
     if (filename.slice(0, 2) === "./" || filename.slice(0, 3) === "../") {
@@ -27,13 +25,11 @@ export const importRemix = {
             post: () => ({
               node: ["_", path.dirname(filePath)],
             }),
-            value: path.dirname(filePath),
           },
           filename: {
             post: () => ({
               node: ["_", filePath],
             }),
-            value: filePath,
           },
         },
       };

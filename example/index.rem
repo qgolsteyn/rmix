@@ -1,0 +1,3 @@
+(defn add1 (message You are customer # (+ (#) 1)))
+
+(map add1 (range 1 7))

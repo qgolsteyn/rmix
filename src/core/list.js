@@ -8,4 +8,7 @@ export default {
   len: {
     post: (node) => ({ node: ["_", node.length] }),
   },
+  get: {
+    post: (node) => ({ node: ["_", node.slice(1)[node[0]]] }),
+  },
 };

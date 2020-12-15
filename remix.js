@@ -1,3 +1,5 @@
+import * as path from "path";
+
 import { remix } from "./src";
 
 const test = (args) => {
@@ -18,4 +20,4 @@ const test = (args) => {
   console.timeEnd();
 };
 
-test({ input: "./example/listOperations.rem" });
+test({ input: path.join(__dirname, "./example/index.rem") });

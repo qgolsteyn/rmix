@@ -1,7 +1,7 @@
 const head = (node) => node[0];
 const tail = (node) => [...node.slice(1)];
 
-export const process = (input, scope = {}) => {
+const process = (input, scope = {}) => {
   const tag = head(input);
 
   if (Array.isArray(tag)) {
@@ -27,7 +27,7 @@ export const process = (input, scope = {}) => {
       siblingScope: { ...siblingScope, ...output.siblingScope },
     };
   } else {
-    let siblingScope = { ...scope };
+    let siblingScope = {};
 
     const visited = [];
     const children = tail(input);
@@ -35,10 +35,10 @@ export const process = (input, scope = {}) => {
       const child = children.shift();
 
       if (Array.isArray(child)) {
-        const { node, siblingScope: newSiblingScope } = process(
-          child,
-          siblingScope
-        );
+        const { node, siblingScope: newSiblingScope } = process(child, {
+          ...scope,
+          ...siblingScope,
+        });
 
         siblingScope = { ...siblingScope, ...newSiblingScope };
 
@@ -71,7 +71,9 @@ export const process = (input, scope = {}) => {
         siblingScope: { ...siblingScope, ...output.siblingScope },
       };
     } else {
-      return { node: [tag, ...visited] };
+      return { node: [tag, ...visited], siblingScope };
     }
   }
 };
+
+export default process;

@@ -8,8 +8,10 @@ export const process = (input, scope = {}) => {
     new Error("Invariant violation: tag must be a symbol");
   }
 
-  if (scope[tag] && scope[tag].preMap) {
-    const { node, siblingScope, innerScope } = scope[tag].preMap(
+  if (tag === "'") {
+    return { node: ["_", ...tail(input)] };
+  } else if (scope[tag] && scope[tag].pre) {
+    const { node, siblingScope, innerScope } = scope[tag].pre(
       tail(input),
       scope
     );
@@ -51,10 +53,12 @@ export const process = (input, scope = {}) => {
       }
     }
 
-    if (scope[tag] && scope[tag].map) {
-      const { map } = scope[tag];
+    if (tag === "~") {
+      return process(["_", ...visited], scope);
+    } else if (scope[tag] && scope[tag].post) {
+      const { post } = scope[tag];
 
-      const { node, siblingScope, innerScope } = map(visited, scope);
+      const { node, siblingScope, innerScope } = post(visited, scope);
 
       const output = process(node, {
         ...scope,

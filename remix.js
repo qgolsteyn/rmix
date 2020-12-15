@@ -4,9 +4,9 @@ const test = (args) => {
   console.time();
   console.log(
     JSON.stringify(
-      remix(["_", ["load", ["input"]]], {
+      remix(["_", ["import", ["input"]]], {
         input: {
-          map: () => ({
+          post: () => ({
             node: ["_", args.input],
           }),
         },

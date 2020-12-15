@@ -5,15 +5,13 @@ import { def } from "./def";
 import { importRemix } from "./import";
 import { parse } from "./parse";
 import list from "./list";
-import { apply } from "./apply";
 
 export default {
-  def: { preMap: def },
-  apply: { map: apply },
+  def,
   ...list,
   ...conditional,
   ...boolean,
   ...math,
-  import: { map: importRemix },
-  parse: { map: parse },
+  import: importRemix,
+  parse,
 };

@@ -1,6 +1,6 @@
 export default {
   and: {
-    map: (tail) => ({
+    post: (tail) => ({
       node: [
         "_",
         tail.reduce((acc, item) => acc && item === "T", true) ? "T" : "F",
@@ -8,7 +8,7 @@ export default {
     }),
   },
   or: {
-    map: (tail) => ({
+    post: (tail) => ({
       node: [
         "_",
         tail.reduce((acc, item) => acc || item === "T", false) ? "T" : "F",

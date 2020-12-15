@@ -1,21 +1,21 @@
 export default {
   "+": {
-    map: (tail) => ({
+    post: (tail) => ({
       node: ["_", tail.reduce((acc, item) => acc + item)],
     }),
   },
   "-": {
-    map: (tail) => ({
+    post: (tail) => ({
       node: ["_", tail.reduce((acc, item) => acc - item)],
     }),
   },
   "*": {
-    map: (tail) => ({
+    post: (tail) => ({
       node: ["_", tail.reduce((acc, item) => acc * item)],
     }),
   },
   "/": {
-    map: (tail) => ({
+    post: (tail) => ({
       node: ["_", tail.reduce((acc, item) => acc / item)],
     }),
   },

@@ -1,13 +1,14 @@
 export const map = [
   "def",
   "map",
+  ["def", "item", ["head", ["#", "data"]]],
   [
     "?",
     [">", ["len", ["#", "data"]], 0],
     [
       "_",
-      ["apply", ["#", "to"], ["head", ["#", "data"]]],
-      ["map", ["data", ["tail", ["#", "data"]]], ["to", ["#", "to"]]],
+      ["~", ["#", "to"]],
+      ["map", ["to", ["#", "to"]], ["data", ["tail", ["#", "data"]]]],
     ],
   ],
 ];
@@ -15,16 +16,13 @@ export const map = [
 export const filter = [
   "def",
   "filter",
+  ["def", "item", ["head", ["#", "data"]]],
   [
     "?",
     [">", ["len", ["#", "data"]], 0],
     [
       "_",
-      [
-        "?",
-        ["apply", ["#", "condition"], ["head", ["#", "data"]]],
-        ["head", ["#", "data"]],
-      ],
+      ["?", ["~", ["#", "condition"]], ["head", ["#", "data"]]],
       [
         "filter",
         ["data", ["tail", ["#", "data"]]],

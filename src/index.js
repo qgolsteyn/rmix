@@ -6,4 +6,4 @@ export const remix = (node, scope = {}) =>
   process(["_", ["defn", "entrypoint", node], ...runtime], {
     ...core,
     ...scope,
-  }).node;
+  });

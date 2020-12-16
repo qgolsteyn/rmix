@@ -1,13 +1,17 @@
-import process from "../process";
-
 export default {
   "?": {
-    pre: ([cond, truthy, falsy], scope) => {
-      const { node } = process(["_", cond], scope);
-      if (node[1] === "T") {
-        return { node: ["_", truthy] };
-      } else if (node[1] === "F") {
-        return { node: ["_", falsy] };
+    pre: ([cond, truthy, falsy]) => {
+      return {
+        node: ["??", cond, ["truthy", ["'", truthy]], ["falsy", ["'", falsy]]],
+      };
+    },
+  },
+  "??": {
+    post: ([cond, truthy, falsy]) => {
+      if (cond === "T") {
+        return { node: ["_", ...truthy.slice(1)] };
+      } else if (cond === "F") {
+        return { node: ["_", ...falsy.slice(1)] };
       } else {
         throw new Error("Invariant violation: cond must be a boolean.");
       }

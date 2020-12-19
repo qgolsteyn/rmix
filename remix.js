@@ -6,7 +6,7 @@ const test = (args) => {
   console.time();
   console.log(
     JSON.stringify(
-      remix(["_", ["import", ["input"]]], {
+      remix(["_", [".import", ["input"]]], {
         input: {
           post: () => ({
             node: ["_", args.input],

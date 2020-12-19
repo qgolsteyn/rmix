@@ -1,3 +1,0 @@
-(defn add1 (+ (#) 1))
-
-(map add1 (range 1000))

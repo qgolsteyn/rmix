@@ -2,8 +2,8 @@ import boolean from "./boolean";
 import conditional from "./conditional";
 import math from "./math";
 import def from "./def";
-import { importRemix } from "./import";
-import { parse } from "./parse";
+import importRemix from "./import";
+import parse from "./parse";
 import list from "./list";
 
 export default {
@@ -12,6 +12,6 @@ export default {
   ...boolean,
   ...math,
   ...def,
-  import: importRemix,
-  parse,
+  ...importRemix,
+  ...parse,
 };

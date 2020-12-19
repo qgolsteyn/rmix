@@ -26,11 +26,7 @@ const process = (input, initialScope = {}) => {
 
   const stack = [root];
 
-  let maxStackSize = 1;
   while (stack.length > 0) {
-    if (stack.length > maxStackSize) {
-      maxStackSize = stack.length;
-    }
     const frame = stack.pop();
 
     switch (frame.status) {
@@ -156,8 +152,6 @@ const process = (input, initialScope = {}) => {
       }
     }
   }
-
-  console.log(maxStackSize);
 
   return root.node;
 };

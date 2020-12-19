@@ -1,10 +1,11 @@
-const def = ([tag, ...map]) => ({
+const def = ([tag, ...map], scope) => ({
   node: ["_"],
   siblingScope: {
     [tag]: {
       post: (tail) => ({
         node: ["_", ...map],
         innerScope: {
+          ...scope,
           "#": {
             post: () => {
               return { node: ["'", ...tail] };
@@ -17,13 +18,13 @@ const def = ([tag, ...map]) => ({
 });
 
 export default {
-  def: {
+  ".def": {
     post: def,
   },
-  defn: {
+  ".defn": {
     pre: def,
   },
-  apply: {
+  ".apply": {
     post: (tail) => ({ node: ["_", tail] }),
   },
 };

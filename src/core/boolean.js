@@ -1,5 +1,5 @@
 export default {
-  and: {
+  ".and": {
     post: (tail) => ({
       node: [
         "_",
@@ -7,7 +7,7 @@ export default {
       ],
     }),
   },
-  or: {
+  ".or": {
     post: (tail) => ({
       node: [
         "_",

@@ -1,14 +1,16 @@
+import { mapTailAsObject } from "../utils/mapTailAsObject";
+
 export default {
-  head: {
+  ".head": {
     post: (node) => ({ node: ["_", node[0]] }),
   },
-  tail: {
+  ".tail": {
     post: (node) => ({ node: ["_", ...node.slice(1)] }),
   },
-  len: {
+  ".len": {
     post: (node) => ({ node: ["_", node.length] }),
   },
-  get: {
+  ".get": {
     post: (node) => ({ node: ["_", node.slice(1)[node[0]]] }),
   },
 };

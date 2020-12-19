@@ -65,8 +65,10 @@ const parser = (tokenize) =>
     throw new Error(`Missing parse logic for rule ${JSON.stringify(type)}`);
   };
 
-export const parse = {
-  post: ([content]) => ({
-    node: ["_", ...parser(tokenizer(parseRules))(content)],
-  }),
+export default {
+  ".parse": {
+    post: ([content]) => ({
+      node: ["_", ...parser(tokenizer(parseRules))(content)],
+    }),
+  },
 };

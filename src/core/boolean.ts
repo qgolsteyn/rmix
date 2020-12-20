@@ -1,4 +1,6 @@
-export default {
+import { RemixDefinition } from "../types/Definition";
+
+const boolean: Record<string, RemixDefinition> = {
   ".and": {
     post: (tail) => ({
       node: [
@@ -16,3 +18,5 @@ export default {
     }),
   },
 };
+
+export default boolean;

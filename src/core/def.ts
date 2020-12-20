@@ -1,9 +1,14 @@
-const def = (type) => ([tag, ...map], scope) => ({
+import { RemixDefinition, RemixDefinitionFunction } from "../types/Definition";
+import { RemixNode } from "../types/RemixNode";
+
+const defFunction = (type: "pre" | "post"): RemixDefinitionFunction => (
+  [tag, ...map],
+  scope
+) => ({
   node: ["_"],
   siblingScope: {
-    [tag]: {
-      ...scope[tag],
-      [type]: (tail) => ({
+    [tag as string]: {
+      [type]: (tail: RemixNode) => ({
         node: ["_", ...map],
         innerScope: {
           ...scope,
@@ -23,20 +28,22 @@ const def = (type) => ([tag, ...map], scope) => ({
   },
 });
 
-export default {
+const def: Record<string, RemixDefinition> = {
   ".def": {
-    post: def("post"),
+    post: defFunction("post"),
   },
   ".defn": {
-    pre: def("post"),
+    pre: defFunction("post"),
   },
   ".predef": {
-    post: def("pre"),
+    post: defFunction("pre"),
   },
   ".predefn": {
-    pre: def("pre"),
+    pre: defFunction("pre"),
   },
   ".apply": {
     post: (tail) => ({ node: ["_", tail] }),
   },
 };
+
+export default def;

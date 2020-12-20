@@ -1,6 +1,7 @@
-import { remix } from "../src";
 import * as path from "path";
-import scope from "./lib";
+
+import { remix } from "../src/index";
+import scope from "./lib/index";
 
 console.time();
 console.log(

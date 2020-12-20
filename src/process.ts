@@ -1,16 +1,32 @@
-const STATUS = {
-  SETUP: "SETUP",
-  PRE_MAP_CHECK: "PRE_CHECK",
-  VISIT_NODE_CHILDREN: "VISIT_NODE_CHILDREN",
-  COMBINE_PROCESSED_CHILDREN: "COMBINE_PROCESSED_CHILDREN",
-  POST_MAP_CHECK: "POST_CHECK",
-  REPORT_TO_PARENT: "REPORT_TO_PARENT",
-};
+import { RemixDefinition } from "./types/Definition";
+import { RemixNode } from "./types/RemixNode";
 
-const head = (node) => node[0];
-const tail = (node) => node.slice(1);
+enum STATUS {
+  SETUP = "SETUP",
+  PRE_MAP_CHECK = "PRE_CHECK",
+  VISIT_NODE_CHILDREN = "VISIT_NODE_CHILDREN",
+  COMBINE_PROCESSED_CHILDREN = "COMBINE_PROCESSED_CHILDREN",
+  POST_MAP_CHECK = "POST_CHECK",
+  REPORT_TO_PARENT = "REPORT_TO_PARENT",
+}
 
-const process = (input, initialScope = {}) => {
+interface Frame {
+  node: RemixNode;
+  parent: Frame;
+  status: STATUS;
+  scope: Record<string, RemixDefinition>;
+  innerScope: Record<string, RemixDefinition>;
+  siblingScope: Record<string, RemixDefinition>;
+  processedChildren: RemixNode;
+}
+
+const head = (node: RemixNode) => node[0];
+const tail = (node: RemixNode) => node.slice(1);
+
+const process = (
+  input: RemixNode,
+  initialScope: Record<string, RemixDefinition> = {}
+) => {
   const base = {
     node: ["_", input],
     scope: initialScope,
@@ -19,15 +35,23 @@ const process = (input, initialScope = {}) => {
 
   const root = {
     status: STATUS.SETUP,
-    parent: base,
     node: input,
+    scope: {},
     innerScope: {},
+    siblingScope: {},
+    // The base node has a different schema, but we do not need to worry about it
+    parent: base as any,
+    processedChildren: [],
   };
 
-  const stack = [root];
+  const stack: Frame[] = [root];
 
   while (stack.length > 0) {
     const frame = stack.pop();
+
+    if (frame === undefined) {
+      throw new Error("Process error: saw an undefined frame");
+    }
 
     switch (frame.status) {
       case STATUS.SETUP: {
@@ -43,14 +67,23 @@ const process = (input, initialScope = {}) => {
       }
       case STATUS.PRE_MAP_CHECK: {
         const tag = head(frame.node);
+
+        if (typeof tag !== "string") {
+          throw new Error(
+            `Invariant violation: tag is not a string. Received ${tag}`
+          );
+        }
+
         const scope = frame.scope;
+
+        const preFunction = scope[tag]?.pre;
 
         if (tag === "'") {
           frame.status = STATUS.REPORT_TO_PARENT;
           frame.node = ["_", ...tail(frame.node)];
           stack.push(frame);
-        } else if (tag in scope && "pre" in scope[tag]) {
-          const result = scope[tag].pre(tail(frame.node), scope);
+        } else if (preFunction) {
+          const result = preFunction(tail(frame.node), scope);
 
           if (result.siblingScope) {
             frame.parent.siblingScope = {
@@ -63,7 +96,10 @@ const process = (input, initialScope = {}) => {
             status: STATUS.SETUP,
             parent: frame.parent,
             node: result.node,
+            scope: {},
             innerScope: { ...frame.innerScope, ...result.innerScope },
+            siblingScope: {},
+            processedChildren: [],
           });
         } else {
           frame.status = STATUS.VISIT_NODE_CHILDREN;
@@ -88,14 +124,20 @@ const process = (input, initialScope = {}) => {
               status: STATUS.SETUP,
               parent: frame,
               node: child,
+              scope: {},
+              siblingScope: {},
               innerScope: {},
+              processedChildren: [],
             });
           } else if (child !== null && child !== undefined) {
             stack.push({
               status: STATUS.REPORT_TO_PARENT,
               parent: frame,
               node: ["_", child],
+              scope: {},
+              siblingScope: {},
               innerScope: {},
+              processedChildren: [],
             });
           }
         }
@@ -119,8 +161,14 @@ const process = (input, initialScope = {}) => {
         const tag = head(frame.node);
         const scope = frame.scope;
 
-        if (tag in scope && "post" in scope[tag]) {
-          const result = scope[tag].post(tail(frame.node), scope);
+        if (typeof tag !== "string") {
+          throw new Error("Invariant violation: tag is not a string");
+        }
+
+        const postFunction = scope[tag]?.post;
+
+        if (postFunction) {
+          const result = postFunction(tail(frame.node), scope);
 
           if (result.siblingScope) {
             frame.parent.siblingScope = {
@@ -133,7 +181,10 @@ const process = (input, initialScope = {}) => {
             status: STATUS.SETUP,
             parent: frame.parent,
             node: result.node,
+            scope: {},
             innerScope: { ...frame.innerScope, ...result.innerScope },
+            siblingScope: {},
+            processedChildren: [],
           });
         } else {
           frame.status = STATUS.REPORT_TO_PARENT;

@@ -1,11 +1,19 @@
 import * as proc from "process";
 import * as fs from "fs";
 import * as path from "path";
+import { RemixDefinition } from "../../src/types/Definition";
 
-export default {
+const importRemix: Record<string, RemixDefinition> = {
   ".import": {
     post: ([filename], scope) => {
-      const dirname = scope.dirname ? scope.dirname.post().node[1] : proc.cwd();
+      if (typeof filename !== "string") {
+        throw new Error("Invariant violation: filename must be a string");
+      }
+
+      const dirname =
+        scope.dirname && scope.dirname.post
+          ? (scope.dirname.post([], {}).node[1] as string)
+          : (proc.cwd() as string);
 
       let filePath = "";
       if (filename.slice(0, 2) === "./" || filename.slice(0, 3) === "../") {
@@ -20,7 +28,7 @@ export default {
 
       if (extension === ".rem") {
         return {
-          node: [".parse", "(" + fs.readFileSync(filePath, "utf-8") + ")"],
+          node: [".parse", fs.readFileSync(filePath, "utf-8")],
           innerScope: {
             dirname: {
               post: () => ({
@@ -43,3 +51,5 @@ export default {
     },
   },
 };
+
+export default importRemix;

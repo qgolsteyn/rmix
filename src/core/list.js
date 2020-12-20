@@ -13,4 +13,12 @@ export default {
   ".get": {
     post: (node) => ({ node: ["_", node.slice(1)[node[0]]] }),
   },
+  ".map": {
+    post: ([tag, ...list]) => ({
+      node: ["_", ...list.map((item) => [tag, item])],
+    }),
+  },
+  ".range": {
+    post: ([end]) => ({ node: ["_", ...Array(end).keys()] }),
+  },
 };

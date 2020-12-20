@@ -68,7 +68,7 @@ const parser = (tokenize) =>
 export default {
   ".parse": {
     post: ([content]) => ({
-      node: ["_", ...parser(tokenizer(parseRules))(content)],
+      node: ["~", ...parser(tokenizer(parseRules))(content)],
     }),
   },
 };

@@ -104,10 +104,14 @@ const process = (input, initialScope = {}) => {
       case STATUS.COMBINE_PROCESSED_CHILDREN: {
         frame.node = [head(frame.node), ...frame.processedChildren];
         frame.status = STATUS.POST_MAP_CHECK;
-        frame.parent.siblingScope = {
-          ...frame.parent.siblingScope,
-          ...frame.siblingScope,
-        };
+
+        if (head(frame.node) === "~") {
+          frame.parent.siblingScope = {
+            ...frame.parent.siblingScope,
+            ...frame.siblingScope,
+          };
+        }
+
         stack.push(frame);
         break;
       }
@@ -115,11 +119,7 @@ const process = (input, initialScope = {}) => {
         const tag = head(frame.node);
         const scope = frame.scope;
 
-        if (tag === "~") {
-          frame.status = STATUS.PRE_MAP_CHECK;
-          frame.node = ["_", ...tail(frame.node)];
-          stack.push(frame);
-        } else if (tag in scope && "post" in scope[tag]) {
+        if (tag in scope && "post" in scope[tag]) {
           const result = scope[tag].post(tail(frame.node), scope);
 
           if (result.siblingScope) {
@@ -143,7 +143,7 @@ const process = (input, initialScope = {}) => {
         break;
       }
       case STATUS.REPORT_TO_PARENT: {
-        if (head(frame.node) === "_") {
+        if (head(frame.node) === "_" || head(frame.node) === "~") {
           frame.parent.processedChildren.push(...tail(frame.node));
         } else {
           frame.parent.processedChildren.push(frame.node);

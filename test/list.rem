@@ -1,0 +1,9 @@
+(.tests "list mapping"
+    (.test "head returns the first element of the passed values" (.compare (.head 1 2 3 4) 1))
+    (.test "tail returns the elements following the first element of the passed values" (.compare (.head 1 2 3 4) 1))
+    (.test "range returns a list from 0 to end value" 
+        (.compare (root (.range 10)) (root 0 1 2 3 4 5 6 7 8 9)))
+    (_
+        (.defn add1 (+ (#) 1))
+        (.test "map applies a tag to a list"
+            (.compare (root (.map add1 (.range 10))) (root 1 2 3 4 5 6 7 8 9 10)))))

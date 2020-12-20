@@ -1,8 +1,15 @@
 {
-  "name": "rmxd",
+  "name": "remix",
   "version": "1.0.0",
+  "license": "MIT",
   "author": "Quentin Golsteyn",
+  "scripts": {
+    "example": "node -r esm test"
+  },
   "dependencies": {
     "esm": "^3.2.25"
+  },
+  "devDependencies": {
+    "lodash": "^4.17.20"
   }
 }

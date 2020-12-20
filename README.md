@@ -1,1 +1,1 @@
-# rmxd
+# Remix: a tree manipulation library

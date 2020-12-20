@@ -9,6 +9,11 @@ const def = (type) => ([tag, ...map], scope) => ({
           ...scope,
           "#": {
             post: () => {
+              return { node: ["'", ...tail] };
+            },
+          },
+          "#!": {
+            post: () => {
               return { node: ["_", ...tail] };
             },
           },

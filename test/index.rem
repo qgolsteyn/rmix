@@ -1,0 +1,5 @@
+(.import "./testing.rem")
+   
+(; Import test suites)
+(.import "./math.rem")
+(.import "./list.rem")

@@ -8,12 +8,13 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "ts-node packages/rmix-cli"
+    "test": "rmix -f test/index.rem"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.165",
     "@types/node": "^14.14.14",
     "lodash": "^4.17.20",
+    "rmix-cli": "*",
     "rollup": "^2.35.1",
     "rollup-plugin-typescript2": "^0.29.0",
     "ts-node": "^9.1.1",

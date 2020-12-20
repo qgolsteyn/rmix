@@ -1,5 +1,11 @@
 {
-  "name": "rmix-test",
+  "name": "rmix-cli",
   "version": "0.0.0",
-  "license": "MIT"
+  "license": "MIT",
+  "bin": {
+    "rmix": "./index.js"
+  },
+  "dependencies": {
+    "yargs": "^16.2.0"
+  }
 }

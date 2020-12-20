@@ -117,7 +117,7 @@ const process = (input, initialScope = {}) => {
 
         if (tag === "~") {
           frame.status = STATUS.PRE_MAP_CHECK;
-          frame.node(["_", ...tail(frame.node)]);
+          frame.node = ["_", ...tail(frame.node)];
           stack.push(frame);
         } else if (tag in scope && "post" in scope[tag]) {
           const result = scope[tag].post(tail(frame.node), scope);

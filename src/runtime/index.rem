@@ -1,3 +1,4 @@
+(.import "./scope.rem")
 (.import "./list.rem")
 
 (entrypoint)

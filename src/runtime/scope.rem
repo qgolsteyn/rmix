@@ -1,0 +1,2 @@
+(.predefn .scope
+    (.predef (head (#)) (' (#))))

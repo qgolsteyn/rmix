@@ -1,7 +1,7 @@
 import * as path from "path";
 
 import rmix from "rmix";
-import scope from "./lib/index";
+import scope from "rmix-node";
 
 console.time();
 console.log(

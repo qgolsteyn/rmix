@@ -83,24 +83,29 @@ const process = (
           frame.node = ["_", ...tail(frame.node)];
           stack.push(frame);
         } else if (preFunction) {
-          const result = preFunction(tail(frame.node), scope);
+          try {
+            const result = preFunction(tail(frame.node), scope);
 
-          if (result.siblingScope) {
-            frame.parent.siblingScope = {
-              ...frame.parent.siblingScope,
-              ...result.siblingScope,
-            };
+            if (result.siblingScope) {
+              frame.parent.siblingScope = {
+                ...frame.parent.siblingScope,
+                ...result.siblingScope,
+              };
+            }
+
+            stack.push({
+              status: STATUS.SETUP,
+              parent: frame.parent,
+              node: result.node,
+              scope: {},
+              innerScope: { ...frame.innerScope, ...result.innerScope },
+              siblingScope: {},
+              processedChildren: [],
+            });
+          } catch (e) {
+            frame.status = STATUS.VISIT_NODE_CHILDREN;
+            stack.push(frame);
           }
-
-          stack.push({
-            status: STATUS.SETUP,
-            parent: frame.parent,
-            node: result.node,
-            scope: {},
-            innerScope: { ...frame.innerScope, ...result.innerScope },
-            siblingScope: {},
-            processedChildren: [],
-          });
         } else {
           frame.status = STATUS.VISIT_NODE_CHILDREN;
           stack.push(frame);
@@ -168,24 +173,29 @@ const process = (
         const postFunction = scope[tag]?.post;
 
         if (postFunction) {
-          const result = postFunction(tail(frame.node), scope);
+          try {
+            const result = postFunction(tail(frame.node), scope);
 
-          if (result.siblingScope) {
-            frame.parent.siblingScope = {
-              ...frame.parent.siblingScope,
-              ...result.siblingScope,
-            };
+            if (result.siblingScope) {
+              frame.parent.siblingScope = {
+                ...frame.parent.siblingScope,
+                ...result.siblingScope,
+              };
+            }
+
+            stack.push({
+              status: STATUS.SETUP,
+              parent: frame.parent,
+              node: result.node,
+              scope: {},
+              innerScope: { ...frame.innerScope, ...result.innerScope },
+              siblingScope: {},
+              processedChildren: [],
+            });
+          } catch (e) {
+            frame.status = STATUS.REPORT_TO_PARENT;
+            stack.push(frame);
           }
-
-          stack.push({
-            status: STATUS.SETUP,
-            parent: frame.parent,
-            node: result.node,
-            scope: {},
-            innerScope: { ...frame.innerScope, ...result.innerScope },
-            siblingScope: {},
-            processedChildren: [],
-          });
         } else {
           frame.status = STATUS.REPORT_TO_PARENT;
           stack.push(frame);

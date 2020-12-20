@@ -1,6 +1,6 @@
-import { RemixDefinition } from "../types/Definition";
+import { RmixDefinition } from "../types";
 
-const math: Record<string, RemixDefinition> = {
+const math: Record<string, RmixDefinition> = {
   "+": {
     post: (tail) => ({
       node: [

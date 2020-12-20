@@ -1,6 +1,6 @@
-import { RemixDefinition } from "../types/Definition";
+import { RmixDefinition } from "../types";
 
-const boolean: Record<string, RemixDefinition> = {
+const boolean: Record<string, RmixDefinition> = {
   ".and": {
     post: (tail) => ({
       node: [

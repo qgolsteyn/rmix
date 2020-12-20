@@ -1,5 +1,4 @@
-import { RemixDefinition } from "../../src/types/Definition";
-import { RemixNode } from "../../src/types/RemixNode";
+import { RmixDefinition, RmixNode } from "rmix";
 
 const PARSE_RULES = [
   { type: "space", regex: /^\s/ },
@@ -29,7 +28,7 @@ const parser = (
   input: string,
   ast: Array<string | number> = [],
   parents: Array<Array<string | number>> = []
-): RemixNode => {
+): RmixNode => {
   if (input === "") {
     return ast;
   }
@@ -73,7 +72,7 @@ const parser = (
   throw new Error(`Missing parse logic for rule ${JSON.stringify(type)}`);
 };
 
-const parse: Record<string, RemixDefinition> = {
+const parse: Record<string, RmixDefinition> = {
   ".parse": {
     post: ([content]) => {
       if (typeof content !== "string") {

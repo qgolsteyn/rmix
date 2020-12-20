@@ -1,6 +1,6 @@
-import { RemixDefinition } from "../types/Definition";
+import { RmixDefinition } from "../types";
 
-const conditional: Record<string, RemixDefinition> = {
+const conditional: Record<string, RmixDefinition> = {
   "?": {
     pre: ([cond, truthy, falsy]) => {
       return {

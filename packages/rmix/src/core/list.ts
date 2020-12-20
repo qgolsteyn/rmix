@@ -1,6 +1,6 @@
-import { RemixDefinition } from "../types/Definition";
+import { RmixDefinition } from "../types";
 
-const list: Record<string, RemixDefinition> = {
+const list: Record<string, RmixDefinition> = {
   ".head": {
     post: (node) => ({ node: ["_", node[0]] }),
   },

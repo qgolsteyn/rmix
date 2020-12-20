@@ -1,14 +1,13 @@
-import { RemixDefinition, RemixDefinitionFunction } from "../types/Definition";
-import { RemixNode } from "../types/RemixNode";
+import { RmixDefinition, RmixDefinitionFunction, RmixNode } from "../types";
 
-const defFunction = (type: "pre" | "post"): RemixDefinitionFunction => (
+const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
   [tag, ...map],
   scope
 ) => ({
   node: ["_"],
   siblingScope: {
     [tag as string]: {
-      [type]: (tail: RemixNode) => ({
+      [type]: (tail: RmixNode) => ({
         node: ["_", ...map],
         innerScope: {
           ...scope,
@@ -28,7 +27,7 @@ const defFunction = (type: "pre" | "post"): RemixDefinitionFunction => (
   },
 });
 
-const def: Record<string, RemixDefinition> = {
+const def: Record<string, RmixDefinition> = {
   ".def": {
     post: defFunction("post"),
   },

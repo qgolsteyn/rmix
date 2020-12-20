@@ -1,9 +1,9 @@
 import * as proc from "process";
 import * as fs from "fs";
 import * as path from "path";
-import { RemixDefinition } from "../../src/types/Definition";
+import { RmixDefinition } from "rmix";
 
-const importRemix: Record<string, RemixDefinition> = {
+const importRemix: Record<string, RmixDefinition> = {
   ".import": {
     post: ([filename], scope) => {
       if (typeof filename !== "string") {

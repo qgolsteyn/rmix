@@ -1,10 +1,14 @@
 {
-  "name": "rmex",
+  "name": "rmix",
   "version": "0.0.0",
+  "private": true,
   "license": "MIT",
   "author": "Quentin Golsteyn",
+  "workspaces": [
+    "./packages/**"
+  ],
   "scripts": {
-    "test": "ts-node test"
+    "test": "ts-node packages/rmix-cli"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.165",

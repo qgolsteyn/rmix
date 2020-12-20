@@ -1,5 +1,4 @@
-import { RemixDefinition } from "./types/Definition";
-import { RemixNode } from "./types/RemixNode";
+import { RmixDefinition, RmixNode } from "./types";
 
 enum STATUS {
   SETUP = "SETUP",
@@ -11,21 +10,21 @@ enum STATUS {
 }
 
 interface Frame {
-  node: RemixNode;
+  node: RmixNode;
   parent: Frame;
   status: STATUS;
-  scope: Record<string, RemixDefinition>;
-  innerScope: Record<string, RemixDefinition>;
-  siblingScope: Record<string, RemixDefinition>;
-  processedChildren: RemixNode;
+  scope: Record<string, RmixDefinition>;
+  innerScope: Record<string, RmixDefinition>;
+  siblingScope: Record<string, RmixDefinition>;
+  processedChildren: RmixNode;
 }
 
-const head = (node: RemixNode) => node[0];
-const tail = (node: RemixNode) => node.slice(1);
+const head = (node: RmixNode) => node[0];
+const tail = (node: RmixNode) => node.slice(1);
 
 const process = (
-  input: RemixNode,
-  initialScope: Record<string, RemixDefinition> = {}
+  input: RmixNode,
+  initialScope: Record<string, RmixDefinition> = {}
 ) => {
   const base = {
     node: ["_", input],

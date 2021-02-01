@@ -1,3 +1,4 @@
 (; Import test suites)
+(.import "./scope.rem")
 (.import "./math.rem")
 (.import "./list.rem")

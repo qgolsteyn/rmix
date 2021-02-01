@@ -1,0 +1,8 @@
+(; Mapping .tests in order to simplify output when all tests pass in a test suite)
+(.defn .tests
+    (.def .test.testSuiteName (.head (#)))
+    (.defn .test (?
+        (.get 1 (#))
+        (.test.success (.test.testSuiteName) (.get 0 (#)))
+        (.test.failure (.test.testSuiteName) (.get 0 (#)))))
+        (.tail (#!)))

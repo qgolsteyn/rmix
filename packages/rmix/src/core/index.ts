@@ -1,5 +1,4 @@
 import { RmixDefinition } from "../types";
-import boolean from "./boolean";
 import conditional from "./conditional";
 import math from "./math";
 import def from "./def";
@@ -11,7 +10,6 @@ const core: Record<string, RmixDefinition> = {
   ...def,
   ...list,
   ...conditional,
-  ...boolean,
   ...math,
 };
 

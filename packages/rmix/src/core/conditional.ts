@@ -38,6 +38,22 @@ const conditional: Record<string, RmixDefinition> = {
   "<=": { post: ([a, b]) => ({ node: a <= b ? ["_", "T"] : ["_", "F"] }) },
   ">": { post: ([a, b]) => ({ node: a > b ? ["_", "T"] : ["_", "F"] }) },
   "<": { post: ([a, b]) => ({ node: a < b ? ["_", "T"] : ["_", "F"] }) },
+  ".and": {
+    post: (tail) => ({
+      node: [
+        "_",
+        tail.reduce((acc, item) => acc && item === "T", true) ? "T" : "F",
+      ],
+    }),
+  },
+  ".or": {
+    post: (tail) => ({
+      node: [
+        "_",
+        tail.reduce((acc, item) => acc || item === "T", false) ? "T" : "F",
+      ],
+    }),
+  },
 };
 
 export default conditional;

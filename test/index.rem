@@ -1,4 +1,4 @@
 (; Import test suites)
-(.import "./scope.rem")
-(.import "./math.rem")
-(.import "./list.rem")
+(node.import "./scope.rem")
+(node.import "./math.rem")
+(node.import "./list.rem")

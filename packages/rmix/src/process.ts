@@ -22,6 +22,26 @@ interface Frame {
 const head = (node: RmixNode) => node[0];
 const tail = (node: RmixNode) => node.slice(1);
 
+const locateTagInScope = (
+  tag: string,
+  scope: Record<string, RmixDefinition>
+) => {
+  const tagLevels = tag.split(".");
+
+  let activeScope = scope;
+  for (let i = 0; i < tagLevels.length - 1; i++) {
+    const currentTag = tagLevels[i];
+
+    if (activeScope[currentTag] && activeScope[currentTag].namespace) {
+      activeScope = activeScope[currentTag].namespace!;
+    } else {
+      return undefined;
+    }
+  }
+
+  return activeScope[tagLevels[tagLevels.length - 1]];
+};
+
 const process = (
   input: RmixNode,
   initialScope: Record<string, RmixDefinition> = {}
@@ -75,7 +95,7 @@ const process = (
 
         const scope = frame.scope;
 
-        const preFunction = scope[tag]?.pre;
+        const preFunction = locateTagInScope(tag, scope)?.pre;
 
         if (tag === "'") {
           frame.status = STATUS.REPORT_TO_PARENT;
@@ -169,7 +189,7 @@ const process = (
           throw new Error("Invariant violation: tag is not a string");
         }
 
-        const postFunction = scope[tag]?.post;
+        const postFunction = locateTagInScope(tag, scope)?.post;
 
         if (postFunction) {
           try {

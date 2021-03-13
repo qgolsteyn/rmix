@@ -3,7 +3,11 @@ import importRemix from "./import";
 import parse from "./parse";
 
 export default {
-  ...importRemix,
-  ...parse,
-  ...compare,
+  node: {
+    namespace: {
+      ...importRemix,
+      ...parse,
+      ...compare,
+    },
+  },
 };

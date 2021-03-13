@@ -8,21 +8,25 @@ const test = (file) => {
   rmix(
     [
       "_",
-      [".import", path.join(__dirname, "./testing.rem")],
-      [".import", path.join(process.cwd(), file)],
+      ["node.import", path.join(__dirname, "./testing.rem")],
+      ["node.import", path.join(process.cwd(), file)],
     ],
     {
       ...scope,
-      ".test.success": {
-        post: (tail) => {
-          signale.success(tail.join(" > "));
-          return { node: ["_"] };
-        },
-      },
-      ".test.failure": {
-        post: (tail) => {
-          signale.fatal(tail.join(" > "));
-          return { node: ["_"] };
+      test: {
+        namespace: {
+          success: {
+            post: (tail) => {
+              signale.success(tail.join(" > "));
+              return { node: ["_"] };
+            },
+          },
+          failure: {
+            post: (tail) => {
+              signale.fatal(tail.join(" > "));
+              return { node: ["_"] };
+            },
+          },
         },
       },
     }

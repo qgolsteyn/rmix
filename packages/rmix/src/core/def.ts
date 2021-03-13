@@ -28,19 +28,29 @@ const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
 });
 
 const def: Record<string, RmixDefinition> = {
-  ".def": {
+  def: {
     post: defFunction("post"),
+    namespace: {
+      pre: {
+        post: defFunction("pre"),
+      },
+      post: {
+        post: defFunction("post"),
+      },
+    },
   },
-  ".defn": {
+  defn: {
     pre: defFunction("post"),
+    namespace: {
+      pre: {
+        pre: defFunction("pre"),
+      },
+      post: {
+        pre: defFunction("post"),
+      },
+    },
   },
-  ".predef": {
-    post: defFunction("pre"),
-  },
-  ".predefn": {
-    pre: defFunction("pre"),
-  },
-  ".apply": {
+  apply: {
     post: (tail) => ({ node: ["_", tail] }),
   },
 };

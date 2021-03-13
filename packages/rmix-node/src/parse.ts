@@ -73,7 +73,7 @@ const parser = (
 };
 
 const parse: Record<string, RmixDefinition> = {
-  ".parse": {
+  parse: {
     post: ([content]) => {
       if (typeof content !== "string") {
         throw new Error(

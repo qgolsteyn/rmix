@@ -1,7 +1,7 @@
-(.tests "scope"
-        (.test "scope is applied inside an element"
-               (.compare (_
-                          (.def test Yay)
+(tests "scope"
+        (test "scope is applied inside an element"
+               (node.compare (_
+                          (def test Yay)
                           (inner (test))) (inner Yay)))
-        (.test "scope is not applied outside an element"
-               (.compare (inner (_ (.def test Yay)) (test)) (inner (test)))))
+        (test "scope is not applied outside an element"
+               (node.compare (inner (_ (def test Yay)) (test)) (inner (test)))))

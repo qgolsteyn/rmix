@@ -4,7 +4,7 @@ import * as path from "path";
 import { RmixDefinition } from "rmix";
 
 const importRemix: Record<string, RmixDefinition> = {
-  ".import": {
+  import: {
     post: ([filename], scope) => {
       if (typeof filename !== "string") {
         throw new Error("Invariant violation: filename must be a string");
@@ -28,7 +28,7 @@ const importRemix: Record<string, RmixDefinition> = {
 
       if (extension === ".rem") {
         return {
-          node: [".parse", fs.readFileSync(filePath, "utf-8")],
+          node: ["node.parse", fs.readFileSync(filePath, "utf-8")],
           innerScope: {
             dirname: {
               post: () => ({

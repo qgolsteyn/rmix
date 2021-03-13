@@ -14,4 +14,5 @@ export type RmixDefinitionFunction = (
 export type RmixDefinition = {
   post?: RmixDefinitionFunction;
   pre?: RmixDefinitionFunction;
+  namespace?: Record<string, RmixDefinition>;
 };

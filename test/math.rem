@@ -3,4 +3,5 @@
         (test "it can subtract two numbers" (node.compare (- 1 1) 0))
         (test "it can multiply two numbers" (node.compare (* 10 2) 20))
         (test "it can divide two numbers" (node.compare (/ 10 2) 5))
+        (test "it can calculate the power of two numbers" (node.compare (** 2 2 2) 16))
         (test "it can perform complex arithmetic" (node.compare (* 2 (- 10 (/ 10 2))) 10)))

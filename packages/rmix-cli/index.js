@@ -3,22 +3,30 @@ const yargs = require("yargs/yargs");
 
 const process = require("process");
 
-const { test } = require("./src/testing");
+const { build } = require("./src/build");
 
-const argv = yargs(process.argv.slice(2))
+yargs(process.argv.slice(2))
   .usage("Usage: $0 <command> [options]")
   .command(
-    "test",
-    "Run a rmix test suite",
+    "run <file> [output]",
+    "Run a rmix file",
     (yargs) =>
-      yargs.positional("file", {
-        describe: "entrypoint for test suite",
-        default: "test/index.rem",
-      }),
+      yargs
+        .positional("file", {
+          describe: "entrypoint file ",
+          default: "index.rem",
+        })
+        .positional("output", {
+          describe: "output file",
+          default: "out.rem",
+        }),
     (argv) => {
-      test(argv.file);
+      build(argv.file, argv.output);
     }
   )
-  .example("$0 test foo.rem", "Run the test suite located at test/index.rem")
+  .example(
+    "$0 run index.rem out.rem",
+    "Run the file located at index.rem and output at out.rem"
+  )
   .help("h")
   .alias("h", "help").argv;

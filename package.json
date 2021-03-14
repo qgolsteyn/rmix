@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "rmix test"
+    "test": "rmix run test/index.rem testResult.rem"
   },
   "devDependencies": {
     "rmix-cli": "*",

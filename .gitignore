@@ -1,2 +1,6 @@
 node_modules
 dist
+
+# Testing
+testResult.rem
+out.rem

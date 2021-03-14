@@ -1,12 +1,14 @@
-(tests "list mapping"
-    (test "head returns the first element of the passed values" (node.compare (list.head 1 2 3 4) 1))
-
-    (test "tail returns the elements following the first element of the passed values" (node.compare (list.head 1 2 3 4) 1))
-
-    (test "range returns a list from 0 to end value" 
+(tests 
+    (name list mapping)
+    (test 
+        (name head returns the first element of the passed values) 
+        (node.compare 
+            (list.head 1 2 3 4) 
+            1))
+    (test (name tail returns the elements following the first element of the passed values) (node.compare (list.head 1 2 3 4) 1))
+    (test (name range returns a list from 0 to end value)
         (node.compare (root (list.range 10)) (root 0 1 2 3 4 5 6 7 8 9)))
-
     (_
         (defn add1 (+ (#) 1))
-        (test "map applies a tag to a list"
+        (test (name map applies a tag to a list)
             (node.compare (root (list.map add1 (list.range 10))) (root 1 2 3 4 5 6 7 8 9 10)))))

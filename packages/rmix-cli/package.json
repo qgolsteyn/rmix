@@ -6,8 +6,6 @@
     "rmix": "./index.js"
   },
   "dependencies": {
-    "cliui": "^7.0.4",
-    "signale": "^1.4.0",
     "yargs": "^16.2.0"
   }
 }

@@ -40,7 +40,7 @@ const conditional: Record<string, RmixDefinition> = {
   "<=": { post: ([a, b]) => ({ node: a <= b ? ["_", "T"] : ["_", "F"] }) },
   ">": { post: ([a, b]) => ({ node: a > b ? ["_", "T"] : ["_", "F"] }) },
   "<": { post: ([a, b]) => ({ node: a < b ? ["_", "T"] : ["_", "F"] }) },
-  ".and": {
+  and: {
     post: (tail) => ({
       node: [
         "_",
@@ -48,7 +48,7 @@ const conditional: Record<string, RmixDefinition> = {
       ],
     }),
   },
-  ".or": {
+  or: {
     post: (tail) => ({
       node: [
         "_",

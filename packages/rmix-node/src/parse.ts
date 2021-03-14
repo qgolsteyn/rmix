@@ -5,7 +5,7 @@ const PARSE_RULES = [
   { type: "lParen", regex: /^\(/ },
   { type: "rParen", regex: /^\)/ },
   { type: "string", regex: /^".*?"/ },
-  { type: "number", regex: /^[0-9]+(\.[0-9]*)?/ },
+  { type: "number", regex: /^(-)?[0-9]+(\.[0-9]*)?/ },
   { type: "alpha", regex: /^[^\s\(\)]+/ },
 ];
 

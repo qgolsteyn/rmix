@@ -76,6 +76,36 @@ const math: Record<string, RmixDefinition> = {
       ],
     }),
   },
+  "++": {
+    post: (tail) => ({
+      node: [
+        "_",
+        ...tail.map((item) => {
+          if (typeof item !== "number") {
+            throw new Error(
+              "Invariant violation: item of list must be a number"
+            );
+          }
+          return item + 1;
+        }),
+      ],
+    }),
+  },
+  "--": {
+    post: (tail) => ({
+      node: [
+        "_",
+        ...tail.map((item) => {
+          if (typeof item !== "number") {
+            throw new Error(
+              "Invariant violation: item of list must be a number"
+            );
+          }
+          return item - 1;
+        }),
+      ],
+    }),
+  },
   "**": {
     post: (tail) => ({
       node: [

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "rmix",
+  "fileTypes": ["rem"],
+  "patterns": [
+    {
+      "include": "#entity"
+    },
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.rmix",
+          "begin": "[(];",
+          "end": "[)]"
+        }
+      ]
+    },
+    "entity": {
+      "patterns": [
+        {
+          "begin": "([(])([^\\s|(|)|;]+)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.section.expression.start.rmix"
+            },
+            "2": {
+              "name": "entity.name.function.rmix"
+            }
+          },
+          "end": "\\)",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.section.expression.end.rmix"
+            }
+          },
+          "name": "meta.expression.rmix",
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.rmix",
+          "begin": "\"",
+          "end": "\""
+        }
+      ]
+    }
+  },
+  "scopeName": "source.rmix"
+}

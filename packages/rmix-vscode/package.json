@@ -1,0 +1,31 @@
+{
+  "name": "rmix-vscode",
+  "displayName": "rmix Extension",
+  "description": "A VSC extension to support rmix",
+  "publisher": "0",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.35.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "rmix",
+        "extensions": [
+          ".rem"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "rmix",
+        "scopeName": "source.rmix",
+        "path": "./syntaxes/rmix.tmLanguage.json"
+      }
+    ]
+  }
+}

@@ -2,3 +2,4 @@
 (node.import "./scope.rem")
 (node.import "./math.rem")
 (node.import "./list.rem")
+(node.import "./recursive.rem")

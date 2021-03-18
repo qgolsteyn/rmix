@@ -1,3 +1,4 @@
+import { def as defAPI } from "../api";
 import { RmixDefinition, RmixDefinitionFunction, RmixNode } from "../types";
 
 const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
@@ -11,16 +12,8 @@ const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
         node: ["_", ...map],
         innerScope: {
           ...scope,
-          "#": {
-            post: () => {
-              return { node: ["'", ...tail] };
-            },
-          },
-          "#!": {
-            post: () => {
-              return { node: ["_", ...tail] };
-            },
-          },
+          "#": defAPI.post(() => ["'", ...tail]),
+          "#!": defAPI.post(() => ["_", ...tail]),
         },
       }),
     },
@@ -50,9 +43,7 @@ const def: Record<string, RmixDefinition> = {
       },
     },
   },
-  apply: {
-    post: (tail) => ({ node: ["_", tail] }),
-  },
+  apply: defAPI.post((tail) => ["_", tail]),
 };
 
 export default def;

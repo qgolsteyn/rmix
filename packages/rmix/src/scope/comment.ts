@@ -1,9 +1,8 @@
+import { def } from "../api";
 import { RmixDefinition } from "../types";
 
 const comment: Record<string, RmixDefinition> = {
-  ";": {
-    post: () => ({ node: ["_"] }),
-  },
+  ";": def.post(() => ["_"]),
 };
 
 export default comment;

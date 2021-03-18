@@ -1,4 +1,4 @@
-import { RmixDefinition, RmixNode } from "rmix";
+import { def, RmixDefinition, RmixNode } from "rmix";
 
 const generateOutput = (node: RmixNode, indent = 0): string => {
   if (node.length === 0) {
@@ -40,11 +40,7 @@ const generateOutput = (node: RmixNode, indent = 0): string => {
 };
 
 const stringify: Record<string, RmixDefinition> = {
-  stringify: {
-    post: (tail) => {
-      return { node: ["_", generateOutput(["_", ...tail])] };
-    },
-  },
+  stringify: def.post((tail) => ["_", generateOutput(["_", ...tail])]),
 };
 
 export default stringify;

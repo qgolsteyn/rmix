@@ -1,4 +1,4 @@
-import { RmixDefinition, RmixNode } from "rmix";
+import { def, RmixDefinition, RmixNode } from "rmix";
 
 const PARSE_RULES = [
   { type: "space", regex: /^\s/ },
@@ -73,21 +73,17 @@ const parser = (
 };
 
 const parse: Record<string, RmixDefinition> = {
-  parse: {
-    post: ([content]) => {
-      if (typeof content !== "string") {
-        throw new Error(
-          `Invariant violation: input to parse must be a string. Received ${typeof content}`
-        );
-      }
+  parse: def.post(([content]) => {
+    if (typeof content !== "string") {
+      throw new Error(
+        `Invariant violation: input to parse must be a string. Received ${typeof content}`
+      );
+    }
 
-      const result = parser(content);
+    const result = parser(content);
 
-      return {
-        node: ["~", ...result],
-      };
-    },
-  },
+    return ["~", ...result];
+  }),
 };
 
 export default parse;

@@ -1,4 +1,4 @@
-import core from "./core/index";
+import coreScope from "./scope";
 import process from "./process";
 import { RmixDefinition, RmixNode } from "./types";
 
@@ -9,9 +9,11 @@ export {
   RmixNode,
 } from "./types";
 
+export { def } from "./api";
+
 const rmix = (node: RmixNode, scope: Record<string, RmixDefinition> = {}) =>
   process(["_", node], {
-    ...core,
+    ...coreScope,
     ...scope,
   });
 

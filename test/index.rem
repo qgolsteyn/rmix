@@ -1,5 +1,19 @@
-(; Import test suites)
-(node.import "./scope.rem")
-(node.import "./math.rem")
-(node.import "./list.rem")
-(node.import "./recursive.rem")
+(defn successSummary
+    (defn tests (defn name) (defn it) (defn test (? (== (list.get 1 (#))) 1 0)) (+ (#!)))
+    (success (+ (#!))))
+
+(defn failureSummary
+    (defn tests (defn name) (defn it) (defn test (? (== (list.get 1 (#))) 0 1)) (+ (#!)))
+    (failure (+ (#!))))
+
+(def testResult
+    (; Import test suites)
+    (node.import "./scope.rem")
+    (node.import "./math.rem")
+    (node.import "./list.rem")
+    (node.import "./recursive.rem"))
+
+(successSummary (testResult))
+(failureSummary (testResult))
+
+(detailedReport (testResult))

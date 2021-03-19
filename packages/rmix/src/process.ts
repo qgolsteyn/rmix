@@ -1,7 +1,12 @@
+import _ from "lodash";
 import { RmixDefinition, RmixNode } from "./types";
+
+const merge = (...rest: Array<Record<string, unknown> | undefined>) =>
+  _.merge({}, ...rest);
 
 enum STATUS {
   SETUP = "SETUP",
+  ENTRY_MAP_CHECK = "ENTRY_MAP_CHECK",
   PRE_MAP_CHECK = "PRE_CHECK",
   VISIT_NODE_CHILDREN = "VISIT_NODE_CHILDREN",
   COMBINE_PROCESSED_CHILDREN = "COMBINE_PROCESSED_CHILDREN",
@@ -74,12 +79,31 @@ const process = (
 
     switch (frame.status) {
       case STATUS.SETUP: {
+        frame.status = STATUS.ENTRY_MAP_CHECK;
+        frame.scope = merge(
+          frame.parent.scope,
+          frame.parent.siblingScope,
+          frame.innerScope
+        );
+
+        stack.push(frame);
+        break;
+      }
+      case STATUS.ENTRY_MAP_CHECK: {
         frame.status = STATUS.PRE_MAP_CHECK;
-        frame.scope = {
-          ...frame.parent.scope,
-          ...frame.parent.siblingScope,
-          ...frame.innerScope,
-        };
+
+        const tag = head(frame.node);
+
+        if (typeof tag !== "string") {
+          throw new Error(
+            `Invariant violation: tag is not a string. Received ${tag}`
+          );
+        }
+
+        const scope = frame.scope;
+        if (scope[tag]?.enter) {
+          frame.scope = merge(frame.scope, frame.scope[tag].enter);
+        }
 
         stack.push(frame);
         break;
@@ -106,10 +130,10 @@ const process = (
             const result = preFunction(tail(frame.node), scope);
 
             if (result.siblingScope) {
-              frame.parent.siblingScope = {
-                ...frame.parent.siblingScope,
-                ...result.siblingScope,
-              };
+              frame.parent.siblingScope = merge(
+                frame.parent.siblingScope,
+                result.siblingScope
+              );
             }
 
             stack.push({
@@ -117,7 +141,7 @@ const process = (
               parent: frame.parent,
               node: result.node,
               scope: {},
-              innerScope: { ...frame.innerScope, ...result.innerScope },
+              innerScope: merge(frame.innerScope, result.innerScope),
               siblingScope: {},
               processedChildren: [],
             });
@@ -172,10 +196,10 @@ const process = (
         frame.status = STATUS.POST_MAP_CHECK;
 
         if (head(frame.node) === "~") {
-          frame.parent.siblingScope = {
-            ...frame.parent.siblingScope,
-            ...frame.siblingScope,
-          };
+          frame.parent.siblingScope = merge(
+            frame.parent.siblingScope,
+            frame.siblingScope
+          );
         }
 
         stack.push(frame);
@@ -196,10 +220,10 @@ const process = (
             const result = postFunction(tail(frame.node), scope);
 
             if (result.siblingScope) {
-              frame.parent.siblingScope = {
-                ...frame.parent.siblingScope,
-                ...result.siblingScope,
-              };
+              frame.parent.siblingScope = merge(
+                frame.parent.siblingScope,
+                result.siblingScope
+              );
             }
 
             stack.push({
@@ -207,7 +231,7 @@ const process = (
               parent: frame.parent,
               node: result.node,
               scope: {},
-              innerScope: { ...frame.innerScope, ...result.innerScope },
+              innerScope: merge(frame.innerScope, result.innerScope),
               siblingScope: {},
               processedChildren: [],
             });

@@ -1,7 +1,7 @@
 (tests (name scope)
         (test (name scope is applied inside an element)
                (node.compare (_
-                          (def test Yay)
-                          (inner (test))) (inner Yay)))
+                          (def testing Yay)
+                          (inner (testing))) (inner Yay)))
         (test (name scope is not applied outside an element)
-               (node.compare (inner (_ (def test Yay)) (test)) (inner (test)))))
+               (node.compare (inner (_ (def testing Yay)) (test)) (inner (test)))))

@@ -4,10 +4,15 @@ import { RmixDefinition, RmixDefinitionFunction, RmixNode } from "../types";
 const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
   [tag, ...map],
   scope
-) => ({
-  node: ["_"],
-  siblingScope: {
-    [tag as string]: {
+) => {
+  if (typeof tag !== "string") {
+    throw new Error("Invariant violation: tag must be a string");
+  }
+
+  const [baseTag, ...tags] = tag.split(">").reverse();
+
+  let base: Record<string, RmixDefinition> = {
+    [baseTag]: {
       [type]: (tail: RmixNode) => ({
         node: ["_", ...map],
         innerScope: {
@@ -17,8 +22,21 @@ const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
         },
       }),
     },
-  },
-});
+  };
+
+  for (const enterTag of tags) {
+    base = {
+      [enterTag]: {
+        enter: base,
+      },
+    };
+  }
+
+  return {
+    node: ["_"],
+    siblingScope: base,
+  };
+};
 
 const def: Record<string, RmixDefinition> = {
   def: {

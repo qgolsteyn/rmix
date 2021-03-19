@@ -11,9 +11,12 @@
     "test": "rmix run test/index.rem testResult.rem"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.1.0",
+    "@rollup/plugin-typescript": "^8.2.0",
+    "lodash": "^4.17.21",
     "rmix-cli": "*",
     "rollup": "^2.35.1",
-    "rollup-plugin-typescript2": "^0.29.0",
+    "tslib": "^2.1.0",
     "typescript": "^4.1.3"
   }
 }

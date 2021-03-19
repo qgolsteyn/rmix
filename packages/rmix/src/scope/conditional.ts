@@ -44,6 +44,15 @@ const conditional: Record<string, RmixDefinition> = {
     "_",
     tail.reduce((acc, item) => acc || item === "T", false) ? "T" : "F",
   ]),
+  isSymbol: def.post(([value]) => {
+    return ["_", typeof value === "string" ? "T" : "F"];
+  }),
+  isNode: def.post(([value]) => {
+    return ["_", Array.isArray(value) ? "T" : "F"];
+  }),
+  isNumber: def.post(([value]) => {
+    return ["_", typeof value === "number" ? "T" : "F"];
+  }),
 };
 
 export default conditional;

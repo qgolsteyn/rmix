@@ -28,7 +28,7 @@ const importRemix: Record<string, RmixDefinition> = {
 
       if (extension === ".rem") {
         return {
-          node: ["node.parse", fs.readFileSync(filePath, "utf-8")],
+          node: ["rmix.parse", fs.readFileSync(filePath, "utf-8")],
           innerScope: {
             dirname: {
               post: () => ({

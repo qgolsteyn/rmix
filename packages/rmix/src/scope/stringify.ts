@@ -1,4 +1,5 @@
-import { def, RmixDefinition, RmixNode } from "rmix";
+import { def, namespace } from "../api";
+import { RmixDefinition, RmixNode } from "../types";
 
 const generateOutput = (node: RmixNode, indent = 0): string => {
   if (node.length === 0) {
@@ -39,8 +40,8 @@ const generateOutput = (node: RmixNode, indent = 0): string => {
   }
 };
 
-const stringify: Record<string, RmixDefinition> = {
+const stringify: Record<string, RmixDefinition> = namespace("rmix", {
   stringify: def.post((tail) => ["_", generateOutput(["_", ...tail])]),
-};
+});
 
 export default stringify;

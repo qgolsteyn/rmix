@@ -6,7 +6,7 @@ const scope = require("rmix-node").default;
 
 const build = (file, out) => {
   const output = rmix(
-    ["_", ["node.stringify", ["node.import", path.join(process.cwd(), file)]]],
+    ["_", ["rmix.stringify", ["node.import", path.join(process.cwd(), file)]]],
     scope
   )[1];
 

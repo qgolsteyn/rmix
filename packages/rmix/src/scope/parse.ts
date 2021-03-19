@@ -1,4 +1,5 @@
-import { def, RmixDefinition, RmixNode } from "rmix";
+import { def, namespace } from "../api";
+import { RmixDefinition, RmixNode } from "../types";
 
 const PARSE_RULES = [
   { type: "space", regex: /^\s/ },
@@ -72,7 +73,7 @@ const parser = (
   throw new Error(`Missing parse logic for rule ${JSON.stringify(type)}`);
 };
 
-const parse: Record<string, RmixDefinition> = {
+const parse: Record<string, RmixDefinition> = namespace("rmix", {
   parse: def.post(([content]) => {
     if (typeof content !== "string") {
       throw new Error(
@@ -84,6 +85,6 @@ const parse: Record<string, RmixDefinition> = {
 
     return ["~", ...result];
   }),
-};
+});
 
 export default parse;

@@ -9,7 +9,7 @@ export {
   RmixNode,
 } from "./types";
 
-export { def } from "./api";
+export { def, namespace } from "./api";
 
 const rmix = (node: RmixNode, scope: Record<string, RmixDefinition> = {}) =>
   process(["_", node], {

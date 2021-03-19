@@ -1,4 +1,4 @@
-import { def as defAPI } from "../api";
+import { def as defAPI, namespace } from "../api";
 import { RmixDefinition, RmixDefinitionFunction, RmixNode } from "../types";
 
 const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
@@ -41,26 +41,26 @@ const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
 const def: Record<string, RmixDefinition> = {
   def: {
     post: defFunction("post"),
-    namespace: {
-      pre: {
-        post: defFunction("pre"),
-      },
-      post: {
-        post: defFunction("post"),
-      },
-    },
   },
+  ...namespace("def", {
+    pre: {
+      post: defFunction("pre"),
+    },
+    post: {
+      post: defFunction("post"),
+    },
+  }),
   defn: {
     pre: defFunction("post"),
-    namespace: {
-      pre: {
-        pre: defFunction("pre"),
-      },
-      post: {
-        pre: defFunction("post"),
-      },
-    },
   },
+  ...namespace("defn", {
+    pre: {
+      pre: defFunction("pre"),
+    },
+    post: {
+      pre: defFunction("post"),
+    },
+  }),
   apply: defAPI.post((tail) => ["_", tail]),
 };
 

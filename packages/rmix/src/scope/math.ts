@@ -1,4 +1,4 @@
-import { def } from "../api";
+import { def, namespace } from "../api";
 import { RmixDefinition } from "../types";
 
 const math: Record<string, RmixDefinition> = {
@@ -74,25 +74,21 @@ const math: Record<string, RmixDefinition> = {
       return Math.pow(acc, item);
     }),
   ]),
-  math: {
-    namespace: {
-      E: def.post(() => ["_", Math.E]),
-      LN2: def.post(() => ["_", Math.LN2]),
-      LN10: def.post(() => ["_", Math.LN10]),
-      PI: def.post(() => ["_", Math.PI]),
-      abs: def.post((tail) => [
-        "_",
-        ...tail.map((item) => {
-          if (typeof item !== "number") {
-            throw new Error(
-              "Invariant violation: item of list must be a number"
-            );
-          }
-          return Math.abs(item);
-        }),
-      ]),
-    },
-  },
+  ...namespace("math", {
+    E: def.post(() => ["_", Math.E]),
+    LN2: def.post(() => ["_", Math.LN2]),
+    LN10: def.post(() => ["_", Math.LN10]),
+    PI: def.post(() => ["_", Math.PI]),
+    abs: def.post((tail) => [
+      "_",
+      ...tail.map((item) => {
+        if (typeof item !== "number") {
+          throw new Error("Invariant violation: item of list must be a number");
+        }
+        return Math.abs(item);
+      }),
+    ]),
+  }),
 };
 
 export default math;

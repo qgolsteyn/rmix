@@ -4,14 +4,17 @@ import pkg from "./package.json";
 
 const input = "./src/index.ts";
 
-const plugins = [typescript(), commonjs()];
+const plugins = [
+  typescript({ declaration: true, declarationDir: "dist/", rootDir: "src/" }),
+  commonjs(),
+];
 
 export default [
   {
-    external: ["lodash"],
+    external: ["lodash", "rmix", "process", "fs", "path"],
     input,
     output: {
-      file: pkg.module,
+      dir: "./dist",
       format: "esm",
       sourcemap: true,
       exports: "named",
@@ -19,7 +22,7 @@ export default [
     plugins,
   },
   {
-    external: ["lodash"],
+    external: ["lodash", "rmix", "process", "fs", "path"],
     input,
     output: {
       file: pkg.main,

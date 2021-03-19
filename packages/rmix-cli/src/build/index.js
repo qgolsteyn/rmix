@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 
 const rmix = require("rmix").default;
-const scope = require("rmix-node");
+const scope = require("rmix-node").default;
 
 const build = (file, out) => {
   const output = rmix(

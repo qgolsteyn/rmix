@@ -6,6 +6,8 @@
     "rmix": "./index.js"
   },
   "dependencies": {
-    "yargs": "^16.2.0"
+    "yargs": "^16.2.0",
+    "rmix": "*",
+    "rmix-node": "*"
   }
 }

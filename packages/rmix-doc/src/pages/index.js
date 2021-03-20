@@ -10,15 +10,18 @@ import "./style.css";
 
 const code = `(html.h1 Welcome to rmix!)
 
-(html.p This document is a small example to the rmix language and interpreter. Rmix is a Lisp
-  based on the concept of node replacement.)
+(html.p This document is a small example to the rmix language
+  and interpreter. Rmix is a Lisp based on the concept of node
+  replacement.)
   
-(html.p The rmix runtime consists of a tree of nodes and a set of replacement rules. If a tag matches
-  a rule, the content of the node is replaced according the rule matched.)
+(html.p The rmix runtime consists of a tree of nodes and a set
+  of replacement rules. If a tag matches a rule, the content of
+  the node is replaced according the rule matched.)
   
 (html.h2 Some examples)
 
-(html.p Press on the hide HTML button to see the underlying rmix code powering this document.)
+(html.p Press on the hide HTML button to see the underlying
+  rmix code powering this document.)
 
 (html.h3 Some math operations)
 

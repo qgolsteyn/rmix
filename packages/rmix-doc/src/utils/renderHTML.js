@@ -9,8 +9,10 @@ const rmixToReact = ([tag, ...tail]) => {
         {tail.map((item) => {
           if (Array.isArray(item)) {
             return rmixToReact(item);
-          } else {
+          } else if (item !== "_") {
             return item + " ";
+          } else {
+            return null;
           }
         })}
       </HTMLTag>
@@ -23,6 +25,8 @@ const rmixToReact = ([tag, ...tail]) => {
             return rmixToReact(item);
           } else if (item !== "_") {
             return item + " ";
+          } else {
+            return null;
           }
         })}
       </>

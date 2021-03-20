@@ -1,0 +1,50 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overscroll-behavior: none;
+}
+
+.sandbox {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 64px 1fr;
+}
+
+.sandbox textarea {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  border: none;
+  background: #e0e0e0;
+  padding: 16px;
+  resize: none;
+}
+
+.sandbox__result-box {
+  overflow: auto;
+  padding: 16px;
+}
+
+.sandbox__controls {
+  background: #eaeaea;
+}
+
+.sandbox__controls button {
+  width: 64px;
+  height: 64px;
+
+  background: transparent;
+  border: none;
+  outline: none;
+
+  cursor: pointer;
+}
+
+.sandbox__controls button:hover {
+  background: #aaaaaa;
+}

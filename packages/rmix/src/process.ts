@@ -126,6 +126,7 @@ const process = (
               processedChildren: [],
             });
           } catch (e) {
+            console.error(e);
             frame.status = STATUS.VISIT_NODE_CHILDREN;
             stack.push(frame);
           }
@@ -216,6 +217,7 @@ const process = (
               processedChildren: [],
             });
           } catch (e) {
+            console.error(e);
             frame.status = STATUS.REPORT_TO_PARENT;
             stack.push(frame);
           }

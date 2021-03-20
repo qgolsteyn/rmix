@@ -16,7 +16,10 @@ const code = `(html.h1 Welcome to rmix!)
   
 (html.p The rmix runtime consists of a tree of nodes and a set
   of replacement rules. If a tag matches a rule, the content of
-  the node is replaced according the rule matched.)
+  the node is replaced according the rule matched. Some rules are dynamic
+  and will execute some Javascript code. This is the case of (html.code list.range)
+  for example, which will be replaced by an incrementing list of numbers with the
+  length given by the first argument. Like so: (list.range 10).)
   
 (html.h2 Some examples)
 
@@ -45,10 +48,11 @@ const code = `(html.h1 Welcome to rmix!)
     (def first (list.get 1 (#)))
     (def second (list.get 2 (#)))
     
-    (+ (first) (second))
+    (def third (+ (first) (second)))
+    (third)
     
     (? (< (count) (max))
-      (fib.inner (++ (count)) (second) (+ (first) (second)))))
+      (fib.inner (++ (count)) (second) (third))))
   
   1 1 (fib.inner 2 1 1))
   
@@ -80,7 +84,7 @@ const IndexPage = () => {
           )}
         </button>
       </div>
-      <div>
+      <div className="sandbox__code-editor">
         <Editor
           value={value}
           onValueChange={setValue}

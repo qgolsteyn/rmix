@@ -19,6 +19,10 @@ body {
   grid-template-columns: 64px 1fr 1fr;
 }
 
+.sandbox__code-editor {
+  overflow: auto;
+}
+
 .sandbox textarea {
   width: 100%;
   height: 100%;

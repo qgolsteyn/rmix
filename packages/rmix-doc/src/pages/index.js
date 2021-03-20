@@ -25,14 +25,34 @@ const code = `(html.h1 Welcome to rmix!)
 
 (html.h3 Some math operations)
 
-(html.p The answer to 2 + 2 * 10 = (+ 2 (* 2 10)))
+(html.p The answer to 2 + 2 * 10 = (html.b (+ 2 (* 2 10))))
 
 (html.h3 Creating a list of elements)
 
 (; Defining a rule to generate an unordered HTML list)
 (defn uList (html.ul (list.map html.li (#))))
 
-(uList (list.range 10))`;
+(uList (list.range 10))
+
+(html.h3 Listing the fibonacci numbers with recursion)
+
+(; Defining a rule to generate the fibonacci suite)
+(defn fib
+  (def max (#))
+  
+  (defn fib.inner
+    (def count (list.get 0 (#)))
+    (def first (list.get 1 (#)))
+    (def second (list.get 2 (#)))
+    
+    (+ (first) (second))
+    
+    (? (< (count) (max))
+      (fib.inner (++ (count)) (second) (+ (first) (second)))))
+  
+  1 1 (fib.inner 2 1 1))
+  
+(html.p The fibonacci suite up to 10: (fib 10))`;
 
 // markup
 const IndexPage = () => {

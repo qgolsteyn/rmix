@@ -8,11 +8,14 @@ import "prismjs/components/prism-lisp";
 
 import "./style.css";
 
-const code = `(html.h1 Welcome to rmix!)
+const code = `(html.h1 (style.color brown) Welcome to rmix!)
 
 (html.p This document is a small example to the rmix language
-  and interpreter. Rmix is a Lisp based on the concept of node
-  replacement.)
+  and interpreter. Rmix is a 
+  (html.a 
+    (attr.href "https://en.wikipedia.org/wiki/Lisp_(programming_language)") 
+    Lisp)
+  based on the concept of node replacement.)
   
 (html.p The rmix runtime consists of a tree of nodes and a set
   of replacement rules. If a tag matches a rule, the content of
@@ -56,7 +59,16 @@ const code = `(html.h1 Welcome to rmix!)
   
   1 1 (fib.inner 2 1 1))
   
-(html.p The fibonacci suite up to 10: (fib 10))`;
+(html.p The fibonacci suite up to 10: (fib 10))
+
+(html.h3 HTML demo)
+
+(html.figure
+  (style.margin "30px 0")
+  (html.img
+    (attr.width 400px)
+    (attr.src "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Concord_Pacific_Master_Plan_Area.jpg/1200px-Concord_Pacific_Master_Plan_Area.jpg"))
+  (html.figcaption A demonstration of HTML attributes and inline styling))`;
 
 // markup
 const IndexPage = () => {
@@ -66,6 +78,7 @@ const IndexPage = () => {
 
   return (
     <main className="sandbox">
+      <title>rmix - a programming language / Sandbox</title>
       <div className="sandbox__controls">
         <button
           onClick={() => setCompiledValue(rmix(["_", ["rmix.parse", value]]))}

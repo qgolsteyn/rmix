@@ -8,6 +8,10 @@
     "packages/*"
   ],
   "scripts": {
+    "package": "yarn workspaces run package",
+    "start-doc": "yarn workspace rmix-doc run start",
+    "prebuild-doc": "yarn package",
+    "build-doc": "yarn workspace rmix-doc run build",
     "test": "rmix run test/index.rem testResult.rem"
   },
   "devDependencies": {

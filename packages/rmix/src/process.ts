@@ -6,7 +6,6 @@ const merge = (...rest: Array<Record<string, unknown> | undefined>) =>
 
 enum STATUS {
   SETUP = "SETUP",
-  ENTRY_MAP_CHECK = "ENTRY_MAP_CHECK",
   PRE_MAP_CHECK = "PRE_CHECK",
   VISIT_NODE_CHILDREN = "VISIT_NODE_CHILDREN",
   COMBINE_PROCESSED_CHILDREN = "COMBINE_PROCESSED_CHILDREN",
@@ -59,31 +58,12 @@ const process = (
 
     switch (frame.status) {
       case STATUS.SETUP: {
-        frame.status = STATUS.ENTRY_MAP_CHECK;
+        frame.status = STATUS.PRE_MAP_CHECK;
         frame.scope = merge(
           frame.parent.scope,
           frame.parent.siblingScope,
           frame.innerScope
         );
-
-        stack.push(frame);
-        break;
-      }
-      case STATUS.ENTRY_MAP_CHECK: {
-        frame.status = STATUS.PRE_MAP_CHECK;
-
-        const tag = head(frame.node);
-
-        if (typeof tag !== "string") {
-          throw new Error(
-            `Invariant violation: tag is not a string. Received ${tag}`
-          );
-        }
-
-        const scope = frame.scope;
-        if (scope[tag]?.enter) {
-          frame.scope = merge(frame.scope, frame.scope[tag].enter);
-        }
 
         stack.push(frame);
         break;

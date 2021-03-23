@@ -2,8 +2,12 @@
   "name": "rmix-vscode",
   "displayName": "rmix Extension",
   "description": "A VSC extension to support rmix",
+  "license": "MIT",
   "publisher": "0",
   "version": "1.0.0",
+  "scripts": {
+    "package": "echo Nothing to package"
+  },
   "categories": [
     "Programming Languages"
   ],

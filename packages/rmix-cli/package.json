@@ -5,6 +5,9 @@
   "bin": {
     "rmix": "./index.js"
   },
+  "scripts": {
+    "package": "echo Nothing to package"
+  },
   "dependencies": {
     "yargs": "^16.2.0",
     "rmix": "*",

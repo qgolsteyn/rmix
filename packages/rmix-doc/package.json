@@ -12,7 +12,8 @@
     "start": "gatsby develop",
     "build": "gatsby build",
     "serve": "gatsby serve",
-    "clean": "gatsby clean"
+    "clean": "gatsby clean",
+    "package": "echo Nothing to package"
   },
   "dependencies": {
     "@mdx-js/mdx": "^1.6.22",

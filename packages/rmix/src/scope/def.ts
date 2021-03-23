@@ -9,32 +9,20 @@ const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
     throw new Error("Invariant violation: tag must be a string");
   }
 
-  const [baseTag, ...tags] = tag.split(">").reverse();
-
-  let base: Record<string, RmixDefinition> = {
-    [baseTag]: {
-      [type]: (tail: RmixNode) => ({
-        node: ["_", ...map],
-        innerScope: {
-          ...scope,
-          "#": defAPI.post(() => ["'", ...tail]),
-          "#!": defAPI.post(() => ["_", ...tail]),
-        },
-      }),
-    },
-  };
-
-  for (const enterTag of tags) {
-    base = {
-      [enterTag]: {
-        enter: base,
-      },
-    };
-  }
-
   return {
     node: ["_"],
-    siblingScope: base,
+    siblingScope: {
+      [tag]: {
+        [type]: (tail: RmixNode) => ({
+          node: ["_", ...map],
+          innerScope: {
+            ...scope,
+            "#": defAPI.post(() => ["'", ...tail]),
+            "#!": defAPI.post(() => ["_", ...tail]),
+          },
+        }),
+      },
+    },
   };
 };
 

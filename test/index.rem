@@ -1,13 +1,11 @@
 (; Definitions)
 (defn successSummary
-    (defn tests>test (? (list.get 1 (#)) 1 0))
-    (defn tests (+ (list.filter isNumber (#!))))
+    (defn tests (defn test (? (list.get 1 (#)) 1 0)) (+ (list.filter isNumber (#!))))
 
     (success (+ (list.filter isNumber (#!)))))
 
 (defn failureSummary
-    (defn tests>test (? (list.get 1 (#)) 0 1))
-    (defn tests (+ (list.filter isNumber (#!))))
+    (defn tests (defn test (? (list.get 1 (#)) 0 1)) (+ (list.filter isNumber (#!))))
 
     (failure (+ (list.filter isNumber (#!)))))
 

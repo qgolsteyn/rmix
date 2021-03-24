@@ -1,5 +1,5 @@
 import coreScope from "./scope";
-import process from "./process";
+import process from "./core/process";
 import { RmixDefinition, RmixNode } from "./types";
 
 export {

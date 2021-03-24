@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { RmixDefinition, RmixNode } from "./types";
+import { RmixDefinition, RmixNode } from "../types";
 
 const merge = (...rest: Array<Record<string, unknown> | undefined>) =>
   _.merge({}, ...rest);

@@ -10,9 +10,10 @@ export {
 } from "./types";
 
 export { def, namespace } from "./api";
+export { createNode, createNodeFromArray } from "./core/node";
 
 const rmix = (node: RmixNode, scope: Record<string, RmixDefinition> = {}) =>
-  process(["_", node], {
+  process(node, {
     ...coreScope,
     ...scope,
   });

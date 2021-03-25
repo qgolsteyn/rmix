@@ -81,7 +81,11 @@ const IndexPage = () => {
       <title>rmix - a programming language / Sandbox</title>
       <div className="sandbox__controls">
         <button
-          onClick={() => setCompiledValue(rmix(["_", ["rmix.parse", value]]))}
+          onClick={() => {
+            console.time("rmix");
+            setCompiledValue(rmix(["_", ["rmix.parse", value]]));
+            console.timeEnd("rmix");
+          }}
         >
           <span class="material-icons">play_circle</span>run
         </button>

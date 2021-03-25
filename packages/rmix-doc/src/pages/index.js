@@ -1,5 +1,5 @@
 import * as React from "react";
-import rmix from "rmix";
+import rmix, { createArrayFromNode } from "rmix";
 import rmixToReact from "../utils/renderHTML";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs/components/prism-core";
@@ -7,6 +7,7 @@ import "prismjs/components/prism-clike";
 import "prismjs/components/prism-lisp";
 
 import "./style.css";
+import { createNodeFromArray } from "rmix/src";
 
 const code = `(html.h1 (style.color brown) Welcome to rmix!)
 
@@ -81,7 +82,15 @@ const IndexPage = () => {
       <title>rmix - a programming language / Sandbox</title>
       <div className="sandbox__controls">
         <button
-          onClick={() => setCompiledValue(rmix(["_", ["rmix.parse", value]]))}
+          onClick={() => {
+            console.time("rmix");
+            const output = rmix(
+              createNodeFromArray(["_", ["rmix.parse", value]])
+            );
+            console.timeEnd("rmix");
+
+            setCompiledValue(createArrayFromNode(output));
+          }}
         >
           <span class="material-icons">play_circle</span>run
         </button>
@@ -113,7 +122,13 @@ const IndexPage = () => {
         {showHTML ? (
           rmixToReact(compiledValue)
         ) : (
-          <pre>{rmix(["_", ["rmix.stringify", compiledValue]])[1]}</pre>
+          <pre>
+            {createArrayFromNode(
+              rmix(
+                createNodeFromArray(["_", ["rmix.stringify", compiledValue]])
+              )
+            )}
+          </pre>
         )}
       </div>
     </main>

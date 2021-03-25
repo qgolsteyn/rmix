@@ -91,6 +91,24 @@ const math: Record<string, RmixDefinition> = {
 
     return createNode("_", createNode(acc));
   }),
+  "++": def.post((tail) => {
+    let value = tail?.value || 0;
+
+    if (typeof value !== "number") {
+      throw new Error("Invariant violation: item of list must be a number");
+    }
+
+    return createNode("_", createNode(value + 1));
+  }),
+  "--": def.post((tail) => {
+    let value = tail?.value || 0;
+
+    if (typeof value !== "number") {
+      throw new Error("Invariant violation: item of list must be a number");
+    }
+
+    return createNode("_", createNode(value - 1));
+  }),
 };
 
 export default math;

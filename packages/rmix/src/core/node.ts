@@ -1,10 +1,7 @@
 import { RmixNode } from "../types";
 
+type RmixArrayExtended = Array<RmixArray | RmixNode | string | number>;
 type RmixArray = Array<RmixArray | RmixNode | string | number>;
-
-const isNode = (
-  value: RmixArray | RmixNode | string | number
-): value is RmixNode => typeof value === "object" && "value" in value;
 
 export const createNode = (
   value: string | number | RmixNode,
@@ -14,7 +11,7 @@ export const createNode = (
   next,
 });
 
-export const createNodeFromArray = (array: RmixArray): RmixNode => {
+export const createNodeFromArray = (array: RmixArrayExtended): RmixNode => {
   const headValue = array[0];
 
   if (typeof headValue !== "string") {
@@ -35,4 +32,24 @@ export const createNodeFromArray = (array: RmixArray): RmixNode => {
   }
 
   return head;
+};
+
+export const createArrayFromNode = (node: RmixNode): RmixArray => {
+  const output = [];
+
+  let currentNode: RmixNode | undefined = node;
+
+  while (currentNode) {
+    const value = currentNode.value;
+
+    if (typeof value === "object") {
+      output.push(createArrayFromNode(value));
+    } else {
+      output.push(value);
+    }
+
+    currentNode = currentNode.next;
+  }
+
+  return output;
 };

@@ -1,25 +1,2 @@
-(; Definitions)
-(defn successSummary
-    (defn tests (defn test (? (list.get 1 (#)) 1 0)) (+ (list.filter isNumber (#!))))
-
-    (success (+ (list.filter isNumber (#!)))))
-
-(defn failureSummary
-    (defn tests (defn test (? (list.get 1 (#)) 0 1)) (+ (list.filter isNumber (#!))))
-
-    (failure (+ (list.filter isNumber (#!)))))
-
-(; Run test suite)
-(def testResult
-    (; Import test suite)
-    (node.import "./scope.rem")
-    (node.import "./math.rem")
-    (node.import "./list.rem")
-    (node.import "./recursive.rem"))
-
-(; Test summary section)
-(successSummary (testResult))
-(failureSummary (testResult))
-
-(; Test results section)
-(detailedReport (testResult))
+(defn add1 (+ 1 (#)))
+(add1 2)

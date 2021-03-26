@@ -7,7 +7,7 @@ export interface RmixDefinitionObject {
 }
 
 export type RmixDefinitionFunction = (
-  tail: RmixNode,
+  tail: RmixNode | undefined,
   scope: Record<string, RmixDefinition>
 ) => RmixDefinitionObject;
 

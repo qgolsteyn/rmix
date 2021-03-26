@@ -83,8 +83,10 @@ const IndexPage = () => {
         <button
           onClick={() => {
             console.time("rmix");
-            setCompiledValue(rmix(["_", ["rmix.parse", value]]));
+            const output = rmix(["_", ["rmix.parse", value]]);
             console.timeEnd("rmix");
+
+            setCompiledValue(output);
           }}
         >
           <span class="material-icons">play_circle</span>run
@@ -117,7 +119,7 @@ const IndexPage = () => {
         {showHTML ? (
           rmixToReact(compiledValue)
         ) : (
-          <pre>{rmix(["_", ["rmix.stringify", compiledValue]])[1]}</pre>
+          <pre>{rmix(["_", ["rmix.stringify", compiledValue]])}</pre>
         )}
       </div>
     </main>

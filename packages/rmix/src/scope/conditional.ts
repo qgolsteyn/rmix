@@ -1,55 +1,120 @@
 import { def, namespace } from "../api";
+import { createNode, createNodeFromArray } from "../core/node";
 import { RmixDefinition } from "../types";
 
 const conditional: Record<string, RmixDefinition> = {
-  "?": def.pre(([cond, truthy, falsy]) => [
-    "?.inner",
-    cond,
-    ["truthy", ["'", truthy]],
-    ["falsy", ["'", falsy]],
-  ]),
-  ...namespace("?", {
-    inner: def.post(([cond, truthy, falsy]) => {
-      if (!Array.isArray(truthy)) {
-        throw new Error("Invariant violation: truthy must be an array");
-      }
+  "?": def.pre((node) => {
+    if (node === undefined) {
+      throw new Error("Invariant violation: must specify a condition");
+    }
 
-      if (!Array.isArray(falsy)) {
-        throw new Error("Invariant violation: falsy must be an array");
-      }
+    const truthy = node.next && node.next.value;
+    const falsy = node.next?.next && node.next?.next.value;
+
+    if (falsy) {
+      return createNodeFromArray([
+        "?.inner",
+        node.value,
+        ["?.truthy", ["'", truthy!]],
+        ["?.falsy", ["'", falsy]],
+      ]);
+    } else if (truthy) {
+      return createNodeFromArray([
+        "?.inner",
+        node.value,
+        ["?.truthy", ["'", truthy]],
+      ]);
+    } else {
+      return createNode("_");
+    }
+  }),
+  ...namespace("?", {
+    inner: def.post((node) => {
+      const cond = node?.value;
+
+      const truthyValue = node?.next?.value;
+      const falsyValue = node?.next?.next?.value;
 
       if (cond === "T") {
-        return ["_", ...truthy.slice(1)];
+        if (
+          truthyValue &&
+          typeof truthyValue === "object" &&
+          truthyValue.next
+        ) {
+          return createNode("_", createNode(truthyValue.next.value));
+        } else {
+          return createNode("_");
+        }
       } else if (cond === "F") {
-        return ["_", ...falsy.slice(1)];
+        if (falsyValue && typeof falsyValue === "object" && falsyValue.next) {
+          return createNode("_", createNode(falsyValue.next.value));
+        } else {
+          return createNode("_");
+        }
       } else {
         throw new Error("Invariant violation: cond must be a boolean.");
       }
     }),
   }),
-  "==": def.post(([a, b]) => (a === b ? ["_", "T"] : ["_", "F"])),
-  "!=": def.post(([a, b]) => (a !== b ? ["_", "T"] : ["_", "F"])),
-  ">=": def.post(([a, b]) => (a >= b ? ["_", "T"] : ["_", "F"])),
-  "<=": def.post(([a, b]) => (a <= b ? ["_", "T"] : ["_", "F"])),
-  ">": def.post(([a, b]) => (a > b ? ["_", "T"] : ["_", "F"])),
-  "<": def.post(([a, b]) => (a < b ? ["_", "T"] : ["_", "F"])),
-  and: def.post((tail) => [
-    "_",
-    tail.reduce((acc, item) => acc && item === "T", true) ? "T" : "F",
-  ]),
+  "==": def.post((node) => {
+    const left = node?.value;
+    const right = node?.next?.value;
 
-  or: def.post((tail) => [
-    "_",
-    tail.reduce((acc, item) => acc || item === "T", false) ? "T" : "F",
-  ]),
-  isSymbol: def.post(([value]) => {
-    return ["_", typeof value === "string" ? "T" : "F"];
+    return createNode("_", createNode(left === right ? "T" : "F"));
   }),
-  isNode: def.post(([value]) => {
-    return ["_", Array.isArray(value) ? "T" : "F"];
+  "!=": def.post((node) => {
+    const left = node?.value;
+    const right = node?.next?.value;
+
+    return createNode("_", createNode(left !== right ? "T" : "F"));
   }),
-  isNumber: def.post(([value]) => {
-    return ["_", typeof value === "number" ? "T" : "F"];
+  ">=": def.post((node) => {
+    const left = node?.value;
+    const right = node?.next?.value;
+
+    if (typeof left !== "number" || typeof right !== "number") {
+      throw new Error(
+        "Invariant violation: both side of inequality must be a number"
+      );
+    }
+
+    return createNode("_", createNode(left >= right ? "T" : "F"));
+  }),
+  "<=": def.post((node) => {
+    const left = node?.value;
+    const right = node?.next?.value;
+
+    if (typeof left !== "number" || typeof right !== "number") {
+      throw new Error(
+        "Invariant violation: both side of inequality must be a number"
+      );
+    }
+
+    return createNode("_", createNode(left <= right ? "T" : "F"));
+  }),
+  ">": def.post((node) => {
+    const left = node?.value;
+    const right = node?.next?.value;
+
+    if (typeof left !== "number" || typeof right !== "number") {
+      throw new Error(
+        "Invariant violation: both side of inequality must be a number"
+      );
+    }
+
+    return createNode("_", createNode(left > right ? "T" : "F"));
+  }),
+  "<": def.post((node) => {
+    const left = node?.value;
+    const right = node?.next?.value;
+
+    if (typeof left !== "number" || typeof right !== "number") {
+      throw new Error(
+        "Invariant violation: both side of inequality must be a number"
+      );
+    }
+
+    return createNode("_", createNode(left < right ? "T" : "F"));
   }),
 };
 

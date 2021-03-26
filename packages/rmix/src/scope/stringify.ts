@@ -1,8 +1,9 @@
 import { def, namespace } from "../api";
+import { createNode } from "../core/node";
 import { RmixDefinition, RmixNode } from "../types";
 
-const generateOutput = (node: RmixNode, indent = 0): string => {
-  if (node.length === 0) {
+const generateOutput = (node: RmixNode | undefined, indent = 0): string => {
+  if (!node) {
     return "";
   }
 
@@ -10,9 +11,11 @@ const generateOutput = (node: RmixNode, indent = 0): string => {
   const outputItems = [];
   const isComplex: Record<number, boolean> = {};
 
-  for (let i = 0; i < node.length; i++) {
-    const item = node[i];
-    if (Array.isArray(item)) {
+  let i = 0;
+  let currentNode: RmixNode | undefined = node;
+  while (currentNode) {
+    const item = currentNode.value;
+    if (typeof item === "object") {
       complex = true;
       isComplex[i] = true;
       outputItems.push(generateOutput(item, indent + 4));
@@ -20,6 +23,9 @@ const generateOutput = (node: RmixNode, indent = 0): string => {
       isComplex[i] = false;
       outputItems.push(item);
     }
+
+    i += 1;
+    currentNode = currentNode.next;
   }
 
   if (complex) {
@@ -41,7 +47,9 @@ const generateOutput = (node: RmixNode, indent = 0): string => {
 };
 
 const stringify: Record<string, RmixDefinition> = namespace("rmix", {
-  stringify: def.post((tail) => ["_", generateOutput(["_", ...tail])]),
+  stringify: def.post((tail) =>
+    createNode("_", createNode(generateOutput(createNode("_", tail))))
+  ),
 });
 
 export default stringify;

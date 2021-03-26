@@ -1,5 +1,8 @@
 import { def, namespace } from "../api";
+import { createNodeFromArray } from "../core/node";
 import { RmixDefinition, RmixNode } from "../types";
+
+type RmixParseNode = Array<string | number | RmixParseNode>;
 
 const PARSE_RULES = [
   { type: "space", regex: /^\s/ },
@@ -29,7 +32,7 @@ const parser = (
   input: string,
   ast: Array<string | number> = [],
   parents: Array<Array<string | number>> = []
-): RmixNode => {
+): RmixParseNode => {
   if (input === "") {
     return ast;
   }
@@ -74,16 +77,18 @@ const parser = (
 };
 
 const parse: Record<string, RmixDefinition> = namespace("rmix", {
-  parse: def.post(([content]) => {
-    if (typeof content !== "string") {
+  parse: def.post((content) => {
+    const contentValue = content?.value;
+
+    if (typeof contentValue !== "string") {
       throw new Error(
         `Invariant violation: input to parse must be a string. Received ${typeof content}`
       );
     }
 
-    const result = parser(content);
+    const result = parser(contentValue);
 
-    return ["~", ...result];
+    return createNodeFromArray(["~", ...result]);
   }),
 });
 

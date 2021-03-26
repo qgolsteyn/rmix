@@ -1,8 +1,7 @@
-import _ from "lodash";
 import { RmixDefinition, RmixNode } from "../types";
+import { createNode } from "./node";
 
-const merge = (...rest: Array<Record<string, unknown> | undefined>) =>
-  _.merge({}, ...rest);
+const VISITED_SYMBOL = Symbol("visited");
 
 enum STATUS {
   SETUP = "SETUP",
@@ -18,34 +17,66 @@ interface Frame {
   parent: Frame;
   status: STATUS;
   scope: Record<string, RmixDefinition>;
-  innerScope: Record<string, RmixDefinition>;
-  siblingScope: Record<string, RmixDefinition>;
-  processedChildren: RmixNode;
+  processedChildrenHead: RmixNode;
+  processedChildrenTail: RmixNode;
 }
 
-const head = (node: RmixNode) => node[0];
-const tail = (node: RmixNode) => node.slice(1);
+const head = (node: RmixNode) => node.value;
+const tail = (node: RmixNode) => node.next;
+const isNode = (node: RmixNode | string | number): node is RmixNode =>
+  typeof node === "object";
+
+const getTag = (tag: string, frame: Frame) => {
+  let currentFrame = frame;
+
+  while (currentFrame) {
+    if (currentFrame.scope[tag]) {
+      return currentFrame.scope[tag];
+    } else {
+      currentFrame = currentFrame.parent;
+    }
+  }
+};
+
+const createFrame = (
+  frame: Omit<Frame, "processedChildrenHead" | "processedChildrenTail">
+): Frame => {
+  const processChildren = createNode("_");
+  (frame as Frame).processedChildrenHead = processChildren;
+  (frame as Frame).processedChildrenTail = processChildren;
+
+  return frame as Frame;
+};
+
+const generateStack = (frame: Frame) => {
+  const tags = [];
+  let currentFrame = frame;
+
+  while (currentFrame) {
+    tags.push(currentFrame.node.value);
+    currentFrame = currentFrame.parent;
+  }
+
+  return '"' + tags.join('"\nin "');
+};
 
 const process = (
   input: RmixNode,
   initialScope: Record<string, RmixDefinition> = {}
 ) => {
   const base = {
-    node: ["_", input],
+    node: createNode("_", input),
     scope: initialScope,
-    processedChildren: [],
+    processedChildrenTail: createNode("_"),
   };
 
-  const root = {
+  const root = createFrame({
     status: STATUS.SETUP,
     node: input,
     scope: {},
-    innerScope: {},
-    siblingScope: {},
     // The base node has a different schema, but we do not need to worry about it
     parent: base as any,
-    processedChildren: [],
-  };
+  });
 
   const stack: Frame[] = [root];
 
@@ -59,11 +90,15 @@ const process = (
     switch (frame.status) {
       case STATUS.SETUP: {
         frame.status = STATUS.PRE_MAP_CHECK;
-        frame.scope = merge(
-          frame.parent.scope,
-          frame.parent.siblingScope,
-          frame.innerScope
-        );
+
+        if ((frame.node as any)[VISITED_SYMBOL]) {
+          throw new Error(`Invariant violation: node was seen twice.
+
+Stacktrace:
+${generateStack(frame)}`);
+        } else {
+          (frame.node as any)[VISITED_SYMBOL] = true;
+        }
 
         stack.push(frame);
         break;
@@ -73,38 +108,40 @@ const process = (
 
         if (typeof tag !== "string") {
           throw new Error(
-            `Invariant violation: tag is not a string. Received ${tag}`
+            `Invariant violation: tag is not a string. Received ${tag}.
+
+Stacktrace:
+${generateStack(frame)}`
           );
         }
 
         const scope = frame.scope;
 
-        const preFunction = scope[tag]?.pre;
+        const preFunction = getTag(tag, frame)?.pre;
 
         if (tag === "'") {
           frame.status = STATUS.REPORT_TO_PARENT;
-          frame.node = ["_", ...tail(frame.node)];
+          frame.node = createNode("_", tail(frame.node));
           stack.push(frame);
         } else if (preFunction) {
           try {
             const result = preFunction(tail(frame.node), scope);
 
             if (result.siblingScope) {
-              frame.parent.siblingScope = merge(
-                frame.parent.siblingScope,
+              frame.parent.scope = Object.assign(
+                frame.parent.scope,
                 result.siblingScope
               );
             }
 
-            stack.push({
-              status: STATUS.SETUP,
-              parent: frame.parent,
-              node: result.node,
-              scope: {},
-              innerScope: merge(frame.innerScope, result.innerScope),
-              siblingScope: {},
-              processedChildren: [],
-            });
+            stack.push(
+              createFrame({
+                status: STATUS.SETUP,
+                parent: frame.parent,
+                node: result.node,
+                scope: Object.assign(frame.scope, result.innerScope),
+              })
+            );
           } catch (e) {
             console.error(e);
             frame.status = STATUS.VISIT_NODE_CHILDREN;
@@ -119,48 +156,49 @@ const process = (
       case STATUS.VISIT_NODE_CHILDREN: {
         // Prepare parent frame and add to stack
         frame.status = STATUS.COMBINE_PROCESSED_CHILDREN;
-        frame.siblingScope = {};
-        frame.processedChildren = [];
         stack.push(frame);
 
-        const children = tail(frame.node);
+        const childrenFrames: Frame[] = [];
+        let currentChildren = tail(frame.node);
 
         // Push children to stack for processing
-        for (let i = children.length - 1; i >= 0; i--) {
-          const child = children[i];
-          if (Array.isArray(child)) {
-            stack.push({
-              status: STATUS.SETUP,
-              parent: frame,
-              node: child,
-              scope: {},
-              siblingScope: {},
-              innerScope: {},
-              processedChildren: [],
-            });
-          } else if (child !== null && child !== undefined) {
-            stack.push({
-              status: STATUS.REPORT_TO_PARENT,
-              parent: frame,
-              node: ["_", child],
-              scope: {},
-              siblingScope: {},
-              innerScope: {},
-              processedChildren: [],
-            });
+        while (currentChildren) {
+          const value = head(currentChildren);
+          if (isNode(value)) {
+            childrenFrames.push(
+              createFrame({
+                status: STATUS.SETUP,
+                parent: frame,
+                node: value,
+                scope: {},
+              })
+            );
+          } else if (value !== null && value !== undefined) {
+            childrenFrames.push(
+              createFrame({
+                status: STATUS.REPORT_TO_PARENT,
+                parent: frame,
+                node: createNode("_", createNode(value)),
+                scope: {},
+              })
+            );
           }
+
+          currentChildren = currentChildren.next;
         }
+
+        for (let i = childrenFrames.length - 1; i >= 0; i--) {
+          stack.push(childrenFrames[i]);
+        }
+
         break;
       }
       case STATUS.COMBINE_PROCESSED_CHILDREN: {
-        frame.node = [head(frame.node), ...frame.processedChildren];
+        frame.node.next = frame.processedChildrenHead.next;
         frame.status = STATUS.POST_MAP_CHECK;
 
         if (head(frame.node) === "~") {
-          frame.parent.siblingScope = merge(
-            frame.parent.siblingScope,
-            frame.siblingScope
-          );
+          frame.parent.scope = Object.assign(frame.parent.scope, frame.scope);
         }
 
         stack.push(frame);
@@ -171,31 +209,35 @@ const process = (
         const scope = frame.scope;
 
         if (typeof tag !== "string") {
-          throw new Error("Invariant violation: tag is not a string");
+          throw new Error(
+            `Invariant violation: tag is not a string. Received ${tag}.
+
+Stacktrace:
+${generateStack(frame)}`
+          );
         }
 
-        const postFunction = scope[tag]?.post;
+        const postFunction = getTag(tag, frame)?.post;
 
         if (postFunction) {
           try {
             const result = postFunction(tail(frame.node), scope);
 
             if (result.siblingScope) {
-              frame.parent.siblingScope = merge(
-                frame.parent.siblingScope,
+              frame.parent.scope = Object.assign(
+                frame.parent.scope,
                 result.siblingScope
               );
             }
 
-            stack.push({
-              status: STATUS.SETUP,
-              parent: frame.parent,
-              node: result.node,
-              scope: {},
-              innerScope: merge(frame.innerScope, result.innerScope),
-              siblingScope: {},
-              processedChildren: [],
-            });
+            stack.push(
+              createFrame({
+                status: STATUS.SETUP,
+                parent: frame.parent,
+                node: result.node,
+                scope: Object.assign(frame.scope, result.innerScope),
+              })
+            );
           } catch (e) {
             console.error(e);
             frame.status = STATUS.REPORT_TO_PARENT;
@@ -210,9 +252,16 @@ const process = (
       }
       case STATUS.REPORT_TO_PARENT: {
         if (head(frame.node) === "_" || head(frame.node) === "~") {
-          frame.parent.processedChildren.push(...tail(frame.node));
+          frame.parent.processedChildrenTail.next = tail(frame.node);
+
+          while (frame.parent.processedChildrenTail.next !== undefined) {
+            frame.parent.processedChildrenTail =
+              frame.parent.processedChildrenTail.next;
+          }
         } else {
-          frame.parent.processedChildren.push(frame.node);
+          frame.parent.processedChildrenTail.next = createNode(frame.node);
+          frame.parent.processedChildrenTail =
+            frame.parent.processedChildrenTail.next;
         }
         break;
       }

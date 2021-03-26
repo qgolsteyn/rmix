@@ -21,8 +21,6 @@ interface Frame {
   parent: Frame;
   status: STATUS;
   scope: Record<string, RmixDefinition>;
-  innerScope: Record<string, RmixDefinition>;
-  siblingScope: Record<string, RmixDefinition>;
   processedChildrenHead: RmixNode;
   processedChildrenTail: RmixNode;
 }
@@ -31,6 +29,18 @@ const head = (node: RmixNode) => node.value;
 const tail = (node: RmixNode) => node.next;
 const isNode = (node: RmixNode | string | number): node is RmixNode =>
   typeof node === "object";
+
+const getTag = (tag: string, frame: Frame) => {
+  let currentFrame = frame;
+
+  while (currentFrame) {
+    if (currentFrame.scope[tag]) {
+      return currentFrame.scope[tag];
+    } else {
+      currentFrame = currentFrame.parent;
+    }
+  }
+};
 
 const createFrame = (
   frame: Omit<Frame, "processedChildrenHead" | "processedChildrenTail">
@@ -68,8 +78,6 @@ const process = (
     status: STATUS.SETUP,
     node: input,
     scope: {},
-    innerScope: {},
-    siblingScope: {},
     // The base node has a different schema, but we do not need to worry about it
     parent: base as any,
   });
@@ -86,11 +94,6 @@ const process = (
     switch (frame.status) {
       case STATUS.SETUP: {
         frame.status = STATUS.PRE_MAP_CHECK;
-        frame.scope = merge(
-          frame.parent.scope,
-          frame.parent.siblingScope,
-          frame.innerScope
-        );
 
         if ((frame.node as any)[VISITED_SYMBOL]) {
           throw new Error(`Invariant violation: node was seen twice.
@@ -115,7 +118,7 @@ ${generateStack(frame)}`);
 
         const scope = frame.scope;
 
-        const preFunction = scope[tag]?.pre;
+        const preFunction = getTag(tag, frame)?.pre;
 
         if (tag === "'") {
           frame.status = STATUS.REPORT_TO_PARENT;
@@ -126,8 +129,8 @@ ${generateStack(frame)}`);
             const result = preFunction(tail(frame.node), scope);
 
             if (result.siblingScope) {
-              frame.parent.siblingScope = merge(
-                frame.parent.siblingScope,
+              frame.parent.scope = merge(
+                frame.parent.scope,
                 result.siblingScope
               );
             }
@@ -137,9 +140,7 @@ ${generateStack(frame)}`);
                 status: STATUS.SETUP,
                 parent: frame.parent,
                 node: result.node,
-                scope: {},
-                innerScope: merge(frame.innerScope, result.innerScope),
-                siblingScope: {},
+                scope: merge(frame.scope, result.innerScope),
               })
             );
           } catch (e) {
@@ -156,7 +157,6 @@ ${generateStack(frame)}`);
       case STATUS.VISIT_NODE_CHILDREN: {
         // Prepare parent frame and add to stack
         frame.status = STATUS.COMBINE_PROCESSED_CHILDREN;
-        frame.siblingScope = {};
         stack.push(frame);
 
         const childrenFrames: Frame[] = [];
@@ -172,8 +172,6 @@ ${generateStack(frame)}`);
                 parent: frame,
                 node: value,
                 scope: {},
-                siblingScope: {},
-                innerScope: {},
               })
             );
           } else if (value !== null && value !== undefined) {
@@ -183,8 +181,6 @@ ${generateStack(frame)}`);
                 parent: frame,
                 node: createNode("_", createNode(value)),
                 scope: {},
-                siblingScope: {},
-                innerScope: {},
               })
             );
           }
@@ -203,10 +199,7 @@ ${generateStack(frame)}`);
         frame.status = STATUS.POST_MAP_CHECK;
 
         if (head(frame.node) === "~") {
-          frame.parent.siblingScope = merge(
-            frame.parent.siblingScope,
-            frame.siblingScope
-          );
+          frame.parent.scope = merge(frame.parent.scope, frame.scope);
         }
 
         stack.push(frame);
@@ -220,15 +213,15 @@ ${generateStack(frame)}`);
           throw new Error("Invariant violation: tag is not a string");
         }
 
-        const postFunction = scope[tag]?.post;
+        const postFunction = getTag(tag, frame)?.post;
 
         if (postFunction) {
           try {
             const result = postFunction(tail(frame.node), scope);
 
             if (result.siblingScope) {
-              frame.parent.siblingScope = merge(
-                frame.parent.siblingScope,
+              frame.parent.scope = merge(
+                frame.parent.scope,
                 result.siblingScope
               );
             }
@@ -238,9 +231,7 @@ ${generateStack(frame)}`);
                 status: STATUS.SETUP,
                 parent: frame.parent,
                 node: result.node,
-                scope: {},
-                innerScope: merge(frame.innerScope, result.innerScope),
-                siblingScope: {},
+                scope: merge(frame.scope, result.innerScope),
               })
             );
           } catch (e) {

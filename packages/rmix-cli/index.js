@@ -3,7 +3,7 @@ const yargs = require("yargs/yargs");
 
 const process = require("process");
 
-const { build } = require("./src/build");
+const { run } = require("./src/run");
 
 yargs(process.argv.slice(2))
   .usage("Usage: $0 <command> [options]")
@@ -13,7 +13,7 @@ yargs(process.argv.slice(2))
     (yargs) =>
       yargs
         .positional("file", {
-          describe: "entrypoint file ",
+          describe: "entry file",
           default: "index.rem",
         })
         .positional("output", {
@@ -21,7 +21,7 @@ yargs(process.argv.slice(2))
           default: "out.rem",
         }),
     (argv) => {
-      build(argv.file, argv.output);
+      run(argv.file, argv.output);
     }
   )
   .example(

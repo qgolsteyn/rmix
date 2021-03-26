@@ -1,7 +1,6 @@
-import { RmixNode } from "../types";
+import { RmixNode, RmixArray } from "../types";
 
-type RmixArrayExtended = Array<RmixArray | RmixNode | string | number>;
-type RmixArray = Array<RmixArray | RmixNode | string | number>;
+type RmixArrayExtended = Array<RmixArrayExtended | RmixNode | string | number>;
 
 export const createNode = (
   value: string | number | RmixNode,

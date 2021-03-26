@@ -108,7 +108,10 @@ ${generateStack(frame)}`);
 
         if (typeof tag !== "string") {
           throw new Error(
-            `Invariant violation: tag is not a string. Received ${tag}`
+            `Invariant violation: tag is not a string. Received ${tag}.
+
+Stacktrace:
+${generateStack(frame)}`
           );
         }
 
@@ -206,7 +209,12 @@ ${generateStack(frame)}`);
         const scope = frame.scope;
 
         if (typeof tag !== "string") {
-          throw new Error("Invariant violation: tag is not a string");
+          throw new Error(
+            `Invariant violation: tag is not a string. Received ${tag}.
+
+Stacktrace:
+${generateStack(frame)}`
+          );
         }
 
         const postFunction = getTag(tag, frame)?.post;

@@ -91,15 +91,6 @@ const process = (
       case STATUS.SETUP: {
         frame.status = STATUS.PRE_MAP_CHECK;
 
-        if ((frame.node as any)[VISITED_SYMBOL]) {
-          throw new Error(`Invariant violation: node was seen twice.
-
-Stacktrace:
-${generateStack(frame)}`);
-        } else {
-          (frame.node as any)[VISITED_SYMBOL] = true;
-        }
-
         stack.push(frame);
         break;
       }

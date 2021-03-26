@@ -1,2 +1,4 @@
-(defn add1 (+ 1 (#)))
-(add1 2)
+(def count (+++ 10))
+
+(count)
+(count)

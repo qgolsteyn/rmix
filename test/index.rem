@@ -1,4 +1,0 @@
-(def count (+++ 10))
-
-(count)
-(count)

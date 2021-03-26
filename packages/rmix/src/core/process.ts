@@ -1,8 +1,6 @@
 import { RmixDefinition, RmixNode } from "../types";
 import { createNode } from "./node";
 
-const VISITED_SYMBOL = Symbol("visited");
-
 enum STATUS {
   SETUP = "SETUP",
   PRE_MAP_CHECK = "PRE_CHECK",
@@ -16,9 +14,10 @@ interface Frame {
   node: RmixNode;
   parent: Frame;
   status: STATUS;
-  scope: Record<string, RmixDefinition>;
-  processedChildrenHead: RmixNode;
-  processedChildrenTail: RmixNode;
+  currentProcessedChild: RmixNode;
+  processedChildren: RmixNode;
+  scope?: Record<string, RmixDefinition>;
+  currentChild?: RmixNode;
 }
 
 const head = (node: RmixNode) => node.value;
@@ -30,7 +29,7 @@ const getTag = (tag: string, frame: Frame) => {
   let currentFrame = frame;
 
   while (currentFrame) {
-    if (currentFrame.scope[tag]) {
+    if (currentFrame.scope && currentFrame.scope[tag]) {
       return currentFrame.scope[tag];
     } else {
       currentFrame = currentFrame.parent;
@@ -39,11 +38,15 @@ const getTag = (tag: string, frame: Frame) => {
 };
 
 const createFrame = (
-  frame: Omit<Frame, "processedChildrenHead" | "processedChildrenTail">
+  frame: Omit<
+    Frame,
+    "processedChildren" | "currentProcessedChild" | "currentChild"
+  >
 ): Frame => {
   const processChildren = createNode("_");
-  (frame as Frame).processedChildrenHead = processChildren;
-  (frame as Frame).processedChildrenTail = processChildren;
+  (frame as Frame).currentChild = frame.node;
+  (frame as Frame).processedChildren = processChildren;
+  (frame as Frame).currentProcessedChild = processChildren;
 
   return frame as Frame;
 };
@@ -67,7 +70,7 @@ const process = (
   const base = {
     node: createNode("_", input),
     scope: initialScope,
-    processedChildrenTail: createNode("_"),
+    currentProcessedChild: createNode("_"),
   };
 
   const root = createFrame({
@@ -106,8 +109,6 @@ ${generateStack(frame)}`
           );
         }
 
-        const scope = frame.scope;
-
         const preFunction = getTag(tag, frame)?.pre;
 
         if (tag === "'") {
@@ -116,11 +117,11 @@ ${generateStack(frame)}`
           stack.push(frame);
         } else if (preFunction) {
           try {
-            const result = preFunction(tail(frame.node), scope);
+            const result = preFunction(tail(frame.node));
 
             if (result.siblingScope) {
               frame.parent.scope = Object.assign(
-                frame.parent.scope,
+                frame.parent.scope || {},
                 result.siblingScope
               );
             }
@@ -130,7 +131,7 @@ ${generateStack(frame)}`
                 status: STATUS.SETUP,
                 parent: frame.parent,
                 node: result.node,
-                scope: Object.assign(frame.scope, result.innerScope),
+                scope: result.innerScope,
               })
             );
           } catch (e) {
@@ -145,51 +146,50 @@ ${generateStack(frame)}`
         break;
       }
       case STATUS.VISIT_NODE_CHILDREN: {
-        // Prepare parent frame and add to stack
-        frame.status = STATUS.COMBINE_PROCESSED_CHILDREN;
-        stack.push(frame);
-
-        const childrenFrames: Frame[] = [];
-        let currentChildren = tail(frame.node);
+        let currentChild = frame.currentChild?.next;
+        frame.currentChild = currentChild;
 
         // Push children to stack for processing
-        while (currentChildren) {
-          const value = head(currentChildren);
+        if (currentChild) {
+          // Prepare parent frame and add to stack
+          frame.status = STATUS.VISIT_NODE_CHILDREN;
+          stack.push(frame);
+
+          const value = head(currentChild);
           if (isNode(value)) {
-            childrenFrames.push(
+            stack.push(
               createFrame({
                 status: STATUS.SETUP,
                 parent: frame,
                 node: value,
-                scope: {},
               })
             );
           } else if (value !== null && value !== undefined) {
-            childrenFrames.push(
+            stack.push(
               createFrame({
                 status: STATUS.REPORT_TO_PARENT,
                 parent: frame,
                 node: createNode("_", createNode(value)),
-                scope: {},
               })
             );
           }
-
-          currentChildren = currentChildren.next;
-        }
-
-        for (let i = childrenFrames.length - 1; i >= 0; i--) {
-          stack.push(childrenFrames[i]);
+        } else {
+          // Prepare parent frame and add to stack
+          frame.status = STATUS.COMBINE_PROCESSED_CHILDREN;
+          stack.push(frame);
         }
 
         break;
       }
       case STATUS.COMBINE_PROCESSED_CHILDREN: {
-        frame.node.next = frame.processedChildrenHead.next;
+        frame.node.next = frame.processedChildren.next;
         frame.status = STATUS.POST_MAP_CHECK;
 
         if (head(frame.node) === "~") {
-          frame.parent.scope = Object.assign(frame.parent.scope, frame.scope);
+          frame.parent.scope =
+            frame.parent.scope &&
+            frame.scope &&
+            Object.assign(frame.parent.scope || {}, frame.scope || {});
         }
 
         stack.push(frame);
@@ -197,7 +197,6 @@ ${generateStack(frame)}`
       }
       case STATUS.POST_MAP_CHECK: {
         const tag = head(frame.node);
-        const scope = frame.scope;
 
         if (typeof tag !== "string") {
           throw new Error(
@@ -212,11 +211,11 @@ ${generateStack(frame)}`
 
         if (postFunction) {
           try {
-            const result = postFunction(tail(frame.node), scope);
+            const result = postFunction(tail(frame.node));
 
             if (result.siblingScope) {
               frame.parent.scope = Object.assign(
-                frame.parent.scope,
+                frame.parent.scope || {},
                 result.siblingScope
               );
             }
@@ -226,7 +225,7 @@ ${generateStack(frame)}`
                 status: STATUS.SETUP,
                 parent: frame.parent,
                 node: result.node,
-                scope: Object.assign(frame.scope, result.innerScope),
+                scope: result.innerScope,
               })
             );
           } catch (e) {
@@ -243,16 +242,16 @@ ${generateStack(frame)}`
       }
       case STATUS.REPORT_TO_PARENT: {
         if (head(frame.node) === "_" || head(frame.node) === "~") {
-          frame.parent.processedChildrenTail.next = tail(frame.node);
+          frame.parent.currentProcessedChild.next = tail(frame.node);
 
-          while (frame.parent.processedChildrenTail.next !== undefined) {
-            frame.parent.processedChildrenTail =
-              frame.parent.processedChildrenTail.next;
+          while (frame.parent.currentProcessedChild.next !== undefined) {
+            frame.parent.currentProcessedChild =
+              frame.parent.currentProcessedChild.next;
           }
         } else {
-          frame.parent.processedChildrenTail.next = createNode(frame.node);
-          frame.parent.processedChildrenTail =
-            frame.parent.processedChildrenTail.next;
+          frame.parent.currentProcessedChild.next = createNode(frame.node);
+          frame.parent.currentProcessedChild =
+            frame.parent.currentProcessedChild.next;
         }
         break;
       }

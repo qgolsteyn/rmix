@@ -7,12 +7,10 @@ export interface RmixDefinitionObject {
 }
 
 export type RmixDefinitionFunction = (
-  tail: RmixNode | undefined,
-  scope: Record<string, RmixDefinition>
+  tail: RmixNode | undefined
 ) => RmixDefinitionObject;
 
 export type RmixDefinition = {
   post?: RmixDefinitionFunction;
   pre?: RmixDefinitionFunction;
-  enter?: Record<string, RmixDefinition>;
 };

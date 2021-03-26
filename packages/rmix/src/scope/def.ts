@@ -4,8 +4,7 @@ import { createNode } from "../core/node";
 import { RmixDefinition, RmixDefinitionFunction, RmixNode } from "../types";
 
 const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
-  tagNode,
-  scope
+  tagNode
 ) => {
   const tag = tagNode?.value;
   if (typeof tag !== "string") {
@@ -19,7 +18,6 @@ const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
         [type]: (tail: RmixNode) => ({
           node: createNode("_", _.cloneDeep(tagNode?.next)),
           innerScope: {
-            ...scope,
             "#": defAPI.post(() => createNode("'", _.cloneDeep(tail))),
             "#!": defAPI.post(() => createNode("_", _.cloneDeep(tail))),
           },

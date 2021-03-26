@@ -1,11 +1,7 @@
-import _ from "lodash";
 import { RmixDefinition, RmixNode } from "../types";
 import { createNode } from "./node";
 
 const VISITED_SYMBOL = Symbol("visited");
-
-const merge = (...rest: Array<Record<string, unknown> | undefined>) =>
-  _.merge({}, ...rest);
 
 enum STATUS {
   SETUP = "SETUP",
@@ -129,7 +125,7 @@ ${generateStack(frame)}`);
             const result = preFunction(tail(frame.node), scope);
 
             if (result.siblingScope) {
-              frame.parent.scope = merge(
+              frame.parent.scope = Object.assign(
                 frame.parent.scope,
                 result.siblingScope
               );
@@ -140,7 +136,7 @@ ${generateStack(frame)}`);
                 status: STATUS.SETUP,
                 parent: frame.parent,
                 node: result.node,
-                scope: merge(frame.scope, result.innerScope),
+                scope: Object.assign(frame.scope, result.innerScope),
               })
             );
           } catch (e) {
@@ -199,7 +195,7 @@ ${generateStack(frame)}`);
         frame.status = STATUS.POST_MAP_CHECK;
 
         if (head(frame.node) === "~") {
-          frame.parent.scope = merge(frame.parent.scope, frame.scope);
+          frame.parent.scope = Object.assign(frame.parent.scope, frame.scope);
         }
 
         stack.push(frame);
@@ -220,7 +216,7 @@ ${generateStack(frame)}`);
             const result = postFunction(tail(frame.node), scope);
 
             if (result.siblingScope) {
-              frame.parent.scope = merge(
+              frame.parent.scope = Object.assign(
                 frame.parent.scope,
                 result.siblingScope
               );
@@ -231,7 +227,7 @@ ${generateStack(frame)}`);
                 status: STATUS.SETUP,
                 parent: frame.parent,
                 node: result.node,
-                scope: merge(frame.scope, result.innerScope),
+                scope: Object.assign(frame.scope, result.innerScope),
               })
             );
           } catch (e) {

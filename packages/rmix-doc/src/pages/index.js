@@ -63,12 +63,21 @@ const code = `(html.h1 (style.color brown) Welcome to rmix!)
 
 (html.h3 HTML demo)
 
+(def url (string.concat
+  "https://upload.wikimedia.org/wikipedia/"
+  "commons/thumb/5/57/Concord_Pacific_Master_Plan_Area.jpg"
+  "/1200px-Concord_Pacific_Master_Plan_Area.jpg"))
+
 (html.figure
   (style.margin "30px 0")
   (html.img
     (attr.width 400px)
-    (attr.src "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Concord_Pacific_Master_Plan_Area.jpg/1200px-Concord_Pacific_Master_Plan_Area.jpg"))
-  (html.figcaption A demonstration of HTML attributes and inline styling))`;
+    (attr.src (url)))
+  (html.figcaption A demonstration of HTML attributes and inline styling))
+  
+(html.h3 Splitting a string)
+
+(html.ul (list.map html.li (string.split "," "This,is,an,example,text")))`;
 
 // markup
 const IndexPage = () => {

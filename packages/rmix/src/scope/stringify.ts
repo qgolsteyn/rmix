@@ -1,5 +1,4 @@
-import { def, namespace } from "../api";
-import { createNode } from "../core/node";
+import { def, namespace, rmixNode } from "../api";
 import { RmixDefinition, RmixNode } from "../types";
 
 const generateOutput = (node: RmixNode | undefined, indent = 0): string => {
@@ -48,7 +47,10 @@ const generateOutput = (node: RmixNode | undefined, indent = 0): string => {
 
 const stringify: Record<string, RmixDefinition> = namespace("rmix", {
   stringify: def.post((tail) =>
-    createNode("_", createNode(generateOutput(createNode("_", tail))))
+    rmixNode.createNode(
+      "_",
+      rmixNode.createNode(generateOutput(rmixNode.createNode("_", tail)))
+    )
   ),
 });
 

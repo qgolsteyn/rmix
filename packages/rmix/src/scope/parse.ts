@@ -1,5 +1,5 @@
-import { def, namespace } from "../api";
-import { createNodeFromArray } from "../core/node";
+import { def, namespace, rmixNode } from "../api";
+
 import { RmixDefinition, RmixNode } from "../types";
 
 type RmixParseNode = Array<string | number | RmixParseNode>;
@@ -88,7 +88,7 @@ const parse: Record<string, RmixDefinition> = namespace("rmix", {
 
     const result = parser(contentValue);
 
-    return createNodeFromArray(["~", ...result]);
+    return rmixNode.createNodeFromArray(["~", ...result]);
   }),
 });
 

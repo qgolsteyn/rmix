@@ -1,10 +1,11 @@
-import { def, namespace } from "../api";
-import { createNode } from "../core/node";
+import { def, namespace, rmixNode } from "../api";
 import { RmixDefinition, RmixNode } from "../types";
 
 const list: Record<string, RmixDefinition> = namespace("list", {
-  head: def.post((node) => createNode("_", node && createNode(node?.value))),
-  tail: def.post((node) => createNode("_", node?.next)),
+  head: def.post((node) =>
+    rmixNode.createNode("_", node && rmixNode.createNode(node?.value))
+  ),
+  tail: def.post((node) => rmixNode.createNode("_", node?.next)),
   len: def.post((node) => {
     let currentNode = node;
     let length = 0;
@@ -14,7 +15,7 @@ const list: Record<string, RmixDefinition> = namespace("list", {
       currentNode = currentNode.next;
     }
 
-    return createNode("_", createNode(length));
+    return rmixNode.createNode("_", rmixNode.createNode(length));
   }),
   get: def.post((node) => {
     const index = node?.value;
@@ -29,10 +30,10 @@ const list: Record<string, RmixDefinition> = namespace("list", {
       currentIndex += 1;
     }
 
-    return createNode(
+    return rmixNode.createNode(
       "_",
       currentNode?.value !== undefined
-        ? createNode(currentNode.value)
+        ? rmixNode.createNode(currentNode.value)
         : undefined
     );
   }),
@@ -42,11 +43,11 @@ const list: Record<string, RmixDefinition> = namespace("list", {
       throw new Error("Invariant violation: end must be an integer");
     }
 
-    const head = createNode("_");
+    const head = rmixNode.createNode("_");
     let tail: RmixNode = head;
 
     for (let i = 0; i < end; i++) {
-      tail.next = createNode(i);
+      tail.next = rmixNode.createNode(i);
       tail = tail.next;
     }
 
@@ -58,13 +59,15 @@ const list: Record<string, RmixDefinition> = namespace("list", {
       throw new Error("Invariant violation: tag must be a string");
     }
 
-    const head = createNode("_");
+    const head = rmixNode.createNode("_");
     let tail: RmixNode = head;
 
     let currentNode = node?.next;
 
     while (currentNode) {
-      tail.next = createNode(createNode(tag, createNode(currentNode.value)));
+      tail.next = rmixNode.createNode(
+        rmixNode.createNode(tag, rmixNode.createNode(currentNode.value))
+      );
 
       tail = tail.next;
       currentNode = currentNode.next;

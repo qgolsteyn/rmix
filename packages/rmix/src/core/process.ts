@@ -1,5 +1,5 @@
 import { RmixDefinition, RmixNode } from "../types";
-import { createNode } from "./node";
+import { createNode } from "../api/rmixNode";
 
 enum STATUS {
   SETUP = "SETUP",
@@ -11,13 +11,13 @@ enum STATUS {
 }
 
 interface Frame {
-  node: RmixNode;
-  parent: Frame;
   status: STATUS;
+  parent: Frame;
+  node: RmixNode;
+  currentChild?: RmixNode;
+  scope?: Record<string, RmixDefinition>;
   currentProcessedChild: RmixNode;
   processedChildren: RmixNode;
-  scope?: Record<string, RmixDefinition>;
-  currentChild?: RmixNode;
 }
 
 const head = (node: RmixNode) => node.value;

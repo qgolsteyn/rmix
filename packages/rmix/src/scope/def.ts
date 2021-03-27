@@ -1,6 +1,5 @@
 import _ from "lodash";
-import { def as defAPI, namespace } from "../api";
-import { createNode } from "../core/node";
+import { def as defAPI, namespace, rmixNode } from "../api";
 import { RmixDefinition, RmixDefinitionFunction, RmixNode } from "../types";
 
 const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
@@ -12,14 +11,16 @@ const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
   }
 
   return {
-    node: createNode("_"),
+    node: rmixNode.createNode("_"),
     siblingScope: {
       [tag]: {
         [type]: (tail: RmixNode) => ({
-          node: createNode("_", _.cloneDeep(tagNode?.next)),
+          node: rmixNode.createNode("_", _.cloneDeep(tagNode?.next)),
           innerScope: {
-            "#": defAPI.post(() => createNode("'", _.cloneDeep(tail))),
-            "#!": defAPI.post(() => createNode("_", _.cloneDeep(tail))),
+            "#": defAPI.post(() => rmixNode.createNode("'", _.cloneDeep(tail))),
+            "#!": defAPI.post(() =>
+              rmixNode.createNode("_", _.cloneDeep(tail))
+            ),
           },
         }),
       },
@@ -50,7 +51,7 @@ const def: Record<string, RmixDefinition> = {
       pre: defFunction("post"),
     },
   }),
-  apply: defAPI.post((tail) => createNode("_", tail)),
+  apply: defAPI.post((tail) => rmixNode.createNode("_", tail)),
 };
 
 export default def;

@@ -1,5 +1,4 @@
-import { def, namespace } from "../api";
-import { createNode, createNodeFromArray } from "../core/node";
+import { def, namespace, rmixNode } from "../api";
 import { RmixDefinition } from "../types";
 
 const conditional: Record<string, RmixDefinition> = {
@@ -12,20 +11,20 @@ const conditional: Record<string, RmixDefinition> = {
     const falsy = node.next?.next && node.next?.next.value;
 
     if (falsy) {
-      return createNodeFromArray([
+      return rmixNode.createNodeFromArray([
         "?.inner",
         node.value,
         ["?.truthy", ["'", truthy!]],
         ["?.falsy", ["'", falsy]],
       ]);
     } else if (truthy) {
-      return createNodeFromArray([
+      return rmixNode.createNodeFromArray([
         "?.inner",
         node.value,
         ["?.truthy", ["'", truthy]],
       ]);
     } else {
-      return createNode("_");
+      return rmixNode.createNode("_");
     }
   }),
   ...namespace("?", {
@@ -41,15 +40,21 @@ const conditional: Record<string, RmixDefinition> = {
           typeof truthyValue === "object" &&
           truthyValue.next
         ) {
-          return createNode("_", createNode(truthyValue.next.value));
+          return rmixNode.createNode(
+            "_",
+            rmixNode.createNode(truthyValue.next.value)
+          );
         } else {
-          return createNode("_");
+          return rmixNode.createNode("_");
         }
       } else if (cond === "F") {
         if (falsyValue && typeof falsyValue === "object" && falsyValue.next) {
-          return createNode("_", createNode(falsyValue.next.value));
+          return rmixNode.createNode(
+            "_",
+            rmixNode.createNode(falsyValue.next.value)
+          );
         } else {
-          return createNode("_");
+          return rmixNode.createNode("_");
         }
       } else {
         throw new Error("Invariant violation: cond must be a boolean.");
@@ -60,13 +65,19 @@ const conditional: Record<string, RmixDefinition> = {
     const left = node?.value;
     const right = node?.next?.value;
 
-    return createNode("_", createNode(left === right ? "T" : "F"));
+    return rmixNode.createNode(
+      "_",
+      rmixNode.createNode(left === right ? "T" : "F")
+    );
   }),
   "!=": def.post((node) => {
     const left = node?.value;
     const right = node?.next?.value;
 
-    return createNode("_", createNode(left !== right ? "T" : "F"));
+    return rmixNode.createNode(
+      "_",
+      rmixNode.createNode(left !== right ? "T" : "F")
+    );
   }),
   ">=": def.post((node) => {
     const left = node?.value;
@@ -78,7 +89,10 @@ const conditional: Record<string, RmixDefinition> = {
       );
     }
 
-    return createNode("_", createNode(left >= right ? "T" : "F"));
+    return rmixNode.createNode(
+      "_",
+      rmixNode.createNode(left >= right ? "T" : "F")
+    );
   }),
   "<=": def.post((node) => {
     const left = node?.value;
@@ -90,7 +104,10 @@ const conditional: Record<string, RmixDefinition> = {
       );
     }
 
-    return createNode("_", createNode(left <= right ? "T" : "F"));
+    return rmixNode.createNode(
+      "_",
+      rmixNode.createNode(left <= right ? "T" : "F")
+    );
   }),
   ">": def.post((node) => {
     const left = node?.value;
@@ -102,7 +119,10 @@ const conditional: Record<string, RmixDefinition> = {
       );
     }
 
-    return createNode("_", createNode(left > right ? "T" : "F"));
+    return rmixNode.createNode(
+      "_",
+      rmixNode.createNode(left > right ? "T" : "F")
+    );
   }),
   "<": def.post((node) => {
     const left = node?.value;
@@ -114,7 +134,10 @@ const conditional: Record<string, RmixDefinition> = {
       );
     }
 
-    return createNode("_", createNode(left < right ? "T" : "F"));
+    return rmixNode.createNode(
+      "_",
+      rmixNode.createNode(left < right ? "T" : "F")
+    );
   }),
 };
 

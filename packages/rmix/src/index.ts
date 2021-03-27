@@ -1,7 +1,7 @@
 import coreScope from "./scope";
 import process from "./core/process";
-import { RmixArray, RmixDefinition, RmixNode } from "./types";
-import { createNodeFromArray, createArrayFromNode } from "./core/node";
+import { RmixArray, RmixDefinition } from "./types";
+import { createNodeFromArray, createArrayFromNode } from "./api/rmixNode";
 
 export {
   RmixDefinition,
@@ -11,12 +11,7 @@ export {
   RmixArray,
 } from "./types";
 
-export { def, namespace } from "./api";
-export {
-  createNode,
-  createNodeFromArray,
-  createArrayFromNode,
-} from "./core/node";
+export { def, namespace, rmixNode } from "./api";
 
 const rmix = (
   node: RmixArray,

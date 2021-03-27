@@ -1,6 +1,5 @@
-import { def, namespace } from "../api";
-import { createNode } from "../core/node";
-import { RmixDefinition, RmixNode } from "../types";
+import { def, rmixNode } from "../api";
+import { RmixDefinition } from "../types";
 
 const math: Record<string, RmixDefinition> = {
   "+": def.post((tail) => {
@@ -23,7 +22,7 @@ const math: Record<string, RmixDefinition> = {
       currentValue = currentValue.next;
     }
 
-    return createNode("_", createNode(acc));
+    return rmixNode.createNode("_", rmixNode.createNode(acc));
   }),
   "-": def.post((tail) => {
     let acc = tail?.value || 0;
@@ -45,7 +44,7 @@ const math: Record<string, RmixDefinition> = {
       currentValue = currentValue.next;
     }
 
-    return createNode("_", createNode(acc));
+    return rmixNode.createNode("_", rmixNode.createNode(acc));
   }),
   "*": def.post((tail) => {
     let acc = tail?.value || 0;
@@ -67,7 +66,7 @@ const math: Record<string, RmixDefinition> = {
       currentValue = currentValue.next;
     }
 
-    return createNode("_", createNode(acc));
+    return rmixNode.createNode("_", rmixNode.createNode(acc));
   }),
   "/": def.post((tail) => {
     let acc = tail?.value || 0;
@@ -89,7 +88,7 @@ const math: Record<string, RmixDefinition> = {
       currentValue = currentValue.next;
     }
 
-    return createNode("_", createNode(acc));
+    return rmixNode.createNode("_", rmixNode.createNode(acc));
   }),
   "++": def.post((tail) => {
     let value = tail?.value || 0;
@@ -98,7 +97,7 @@ const math: Record<string, RmixDefinition> = {
       throw new Error("Invariant violation: item of list must be a number");
     }
 
-    return createNode("_", createNode(value + 1));
+    return rmixNode.createNode("_", rmixNode.createNode(value + 1));
   }),
   "--": def.post((tail) => {
     let value = tail?.value || 0;
@@ -107,7 +106,7 @@ const math: Record<string, RmixDefinition> = {
       throw new Error("Invariant violation: item of list must be a number");
     }
 
-    return createNode("_", createNode(value - 1));
+    return rmixNode.createNode("_", rmixNode.createNode(value - 1));
   }),
 };
 

@@ -88,7 +88,7 @@ const parse: Record<string, RmixDefinition> = namespace("rmix", {
 
     const result = parser(contentValue);
 
-    return rmixNode.createNodeFromArray(["~", ...result]);
+    return rmixNode.createNodeFromArray(["_", ...result]);
   }),
 });
 

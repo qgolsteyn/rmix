@@ -14,13 +14,13 @@ const process = (
 ) => {
   const base = {
     node: createNode("_", input),
-    scope: initialScope,
     currentProcessedChild: createNode("_"),
   };
 
   const root = createFrame({
     status: STATUS.PRE_MAP_CHECK,
     node: input,
+    scope: initialScope,
     // The base node has a different schema, but we do not need to worry about it
     parent: base as any,
   });

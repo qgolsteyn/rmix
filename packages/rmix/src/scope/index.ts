@@ -6,6 +6,7 @@ import list from "./list";
 import conditional from "./conditional";
 import parse from "./parse";
 import stringify from "./stringify";
+import string from "./string";
 
 const core: Record<string, RmixDefinition> = {
   ...comment,
@@ -15,6 +16,7 @@ const core: Record<string, RmixDefinition> = {
   ...conditional,
   ...parse,
   ...stringify,
+  ...string,
 };
 
 export default core;

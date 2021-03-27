@@ -105,14 +105,6 @@ const process = (
       case STATUS.COMBINE_PROCESSED_CHILDREN: {
         frame.node.next = frame.processedChildren.next;
         frame.status = STATUS.POST_MAP_CHECK;
-
-        if (frame.node.value === "~") {
-          frame.parent.scope =
-            frame.parent.scope &&
-            frame.scope &&
-            Object.assign(frame.parent.scope || {}, frame.scope || {});
-        }
-
         break;
       }
       case STATUS.POST_MAP_CHECK: {
@@ -161,7 +153,7 @@ const process = (
         break;
       }
       case STATUS.REPORT_TO_PARENT: {
-        if (frame.node.value === "_" || frame.node.value === "~") {
+        if (frame.node.value === "_") {
           frame.parent.currentProcessedChild.next = frame.node.next;
 
           while (frame.parent.currentProcessedChild.next !== undefined) {

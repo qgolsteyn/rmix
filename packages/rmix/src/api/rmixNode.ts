@@ -52,3 +52,6 @@ export const createArrayFromNode = (node: RmixNode): RmixArray => {
 
   return output;
 };
+
+export const isNode = (node: RmixNode | string | number): node is RmixNode =>
+  typeof node === "object" && "value" in node;

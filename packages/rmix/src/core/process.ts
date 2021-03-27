@@ -1,67 +1,8 @@
 import { RmixDefinition, RmixNode } from "../types";
-import { createNode } from "../api/rmixNode";
-
-enum STATUS {
-  SETUP = "SETUP",
-  PRE_MAP_CHECK = "PRE_CHECK",
-  VISIT_NODE_CHILDREN = "VISIT_NODE_CHILDREN",
-  COMBINE_PROCESSED_CHILDREN = "COMBINE_PROCESSED_CHILDREN",
-  POST_MAP_CHECK = "POST_CHECK",
-  REPORT_TO_PARENT = "REPORT_TO_PARENT",
-}
-
-interface Frame {
-  status: STATUS;
-  parent: Frame;
-  node: RmixNode;
-  currentChild?: RmixNode;
-  scope?: Record<string, RmixDefinition>;
-  currentProcessedChild: RmixNode;
-  processedChildren: RmixNode;
-}
-
-const head = (node: RmixNode) => node.value;
-const tail = (node: RmixNode) => node.next;
-const isNode = (node: RmixNode | string | number): node is RmixNode =>
-  typeof node === "object";
-
-const getTag = (tag: string, frame: Frame) => {
-  let currentFrame = frame;
-
-  while (currentFrame) {
-    if (currentFrame.scope && currentFrame.scope[tag]) {
-      return currentFrame.scope[tag];
-    } else {
-      currentFrame = currentFrame.parent;
-    }
-  }
-};
-
-const createFrame = (
-  frame: Omit<
-    Frame,
-    "processedChildren" | "currentProcessedChild" | "currentChild"
-  >
-): Frame => {
-  const processChildren = createNode("_");
-  (frame as Frame).currentChild = frame.node;
-  (frame as Frame).processedChildren = processChildren;
-  (frame as Frame).currentProcessedChild = processChildren;
-
-  return frame as Frame;
-};
-
-const generateStack = (frame: Frame) => {
-  const tags = [];
-  let currentFrame = frame;
-
-  while (currentFrame) {
-    tags.push(currentFrame.node.value);
-    currentFrame = currentFrame.parent;
-  }
-
-  return '"' + tags.join('"\nin "');
-};
+import { createNode, isNode } from "../api/rmixNode";
+import { Frame, STATUS } from "./types";
+import { createFrame, getTagFromFrame } from "./frame";
+import { createErrorMessage, ERROR_TYPES } from "./error";
 
 const process = (
   input: RmixNode,
@@ -74,9 +15,8 @@ const process = (
   };
 
   const root = createFrame({
-    status: STATUS.SETUP,
+    status: STATUS.PRE_MAP_CHECK,
     node: input,
-    scope: {},
     // The base node has a different schema, but we do not need to worry about it
     parent: base as any,
   });
@@ -87,37 +27,34 @@ const process = (
     const frame = stack.pop();
 
     if (frame === undefined) {
-      throw new Error("Process error: saw an undefined frame");
+      throw new Error(
+        createErrorMessage(ERROR_TYPES.INTERNAL, "Saw an undefined frame")
+      );
     }
 
     switch (frame.status) {
-      case STATUS.SETUP: {
-        frame.status = STATUS.PRE_MAP_CHECK;
-
-        stack.push(frame);
-        break;
-      }
       case STATUS.PRE_MAP_CHECK: {
-        const tag = head(frame.node);
+        const tag = frame.node.value;
 
         if (typeof tag !== "string") {
           throw new Error(
-            `Invariant violation: tag is not a string. Received ${tag}.
-
-Stacktrace:
-${generateStack(frame)}`
+            createErrorMessage(
+              ERROR_TYPES.INVARIANT,
+              `tag is not a string. Received ${tag}.`,
+              frame
+            )
           );
         }
 
-        const preFunction = getTag(tag, frame)?.pre;
+        const preFunction = getTagFromFrame(tag, frame)?.pre;
 
         if (tag === "'") {
           frame.status = STATUS.REPORT_TO_PARENT;
-          frame.node = createNode("_", tail(frame.node));
+          frame.node = createNode("_", frame.node.next);
           stack.push(frame);
         } else if (preFunction) {
           try {
-            const result = preFunction(tail(frame.node));
+            const result = preFunction(frame.node.next);
 
             if (result.siblingScope) {
               frame.parent.scope = Object.assign(
@@ -128,14 +65,17 @@ ${generateStack(frame)}`
 
             stack.push(
               createFrame({
-                status: STATUS.SETUP,
+                status: STATUS.PRE_MAP_CHECK,
                 parent: frame.parent,
                 node: result.node,
                 scope: result.innerScope,
               })
             );
           } catch (e) {
-            console.error(e);
+            console.error(
+              createErrorMessage(ERROR_TYPES.USER, e.message, frame)
+            );
+
             frame.status = STATUS.VISIT_NODE_CHILDREN;
             stack.push(frame);
           }
@@ -155,11 +95,11 @@ ${generateStack(frame)}`
           frame.status = STATUS.VISIT_NODE_CHILDREN;
           stack.push(frame);
 
-          const value = head(currentChild);
+          const { value } = currentChild;
           if (isNode(value)) {
             stack.push(
               createFrame({
-                status: STATUS.SETUP,
+                status: STATUS.PRE_MAP_CHECK,
                 parent: frame,
                 node: value,
               })
@@ -185,7 +125,7 @@ ${generateStack(frame)}`
         frame.node.next = frame.processedChildren.next;
         frame.status = STATUS.POST_MAP_CHECK;
 
-        if (head(frame.node) === "~") {
+        if (frame.node.value === "~") {
           frame.parent.scope =
             frame.parent.scope &&
             frame.scope &&
@@ -196,22 +136,23 @@ ${generateStack(frame)}`
         break;
       }
       case STATUS.POST_MAP_CHECK: {
-        const tag = head(frame.node);
+        const tag = frame.node.value;
 
         if (typeof tag !== "string") {
           throw new Error(
-            `Invariant violation: tag is not a string. Received ${tag}.
-
-Stacktrace:
-${generateStack(frame)}`
+            createErrorMessage(
+              ERROR_TYPES.INVARIANT,
+              `tag is not a string. Received ${tag}.`,
+              frame
+            )
           );
         }
 
-        const postFunction = getTag(tag, frame)?.post;
+        const postFunction = getTagFromFrame(tag, frame)?.post;
 
         if (postFunction) {
           try {
-            const result = postFunction(tail(frame.node));
+            const result = postFunction(frame.node.next);
 
             if (result.siblingScope) {
               frame.parent.scope = Object.assign(
@@ -222,14 +163,17 @@ ${generateStack(frame)}`
 
             stack.push(
               createFrame({
-                status: STATUS.SETUP,
+                status: STATUS.PRE_MAP_CHECK,
                 parent: frame.parent,
                 node: result.node,
                 scope: result.innerScope,
               })
             );
           } catch (e) {
-            console.error(e);
+            console.error(
+              createErrorMessage(ERROR_TYPES.USER, e.message, frame)
+            );
+
             frame.status = STATUS.REPORT_TO_PARENT;
             stack.push(frame);
           }
@@ -241,8 +185,8 @@ ${generateStack(frame)}`
         break;
       }
       case STATUS.REPORT_TO_PARENT: {
-        if (head(frame.node) === "_" || head(frame.node) === "~") {
-          frame.parent.currentProcessedChild.next = tail(frame.node);
+        if (frame.node.value === "_" || frame.node.value === "~") {
+          frame.parent.currentProcessedChild.next = frame.node.next;
 
           while (frame.parent.currentProcessedChild.next !== undefined) {
             frame.parent.currentProcessedChild =

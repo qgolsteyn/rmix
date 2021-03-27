@@ -21,17 +21,9 @@ const process = (
     parent: base as any,
   });
 
-  const stack: Frame[] = [root];
+  let frame = root;
 
-  while (stack.length > 0) {
-    const frame = stack.pop();
-
-    if (frame === undefined) {
-      throw new Error(
-        createErrorMessage(ERROR_TYPES.INTERNAL, "Saw an undefined frame")
-      );
-    }
-
+  while (frame) {
     switch (frame.status) {
       case STATUS.PRE_MAP_CHECK: {
         const tag = frame.node.value;
@@ -51,7 +43,6 @@ const process = (
         if (tag === "'") {
           frame.status = STATUS.REPORT_TO_PARENT;
           frame.node = createNode("_", frame.node.next);
-          stack.push(frame);
         } else if (preFunction) {
           try {
             const result = preFunction(frame.node.next);
@@ -63,25 +54,21 @@ const process = (
               );
             }
 
-            stack.push(
-              createFrame({
-                status: STATUS.PRE_MAP_CHECK,
-                parent: frame.parent,
-                node: result.node,
-                scope: result.innerScope,
-              })
-            );
+            frame = createFrame({
+              status: STATUS.PRE_MAP_CHECK,
+              parent: frame.parent,
+              node: result.node,
+              scope: result.innerScope,
+            });
           } catch (e) {
             console.error(
               createErrorMessage(ERROR_TYPES.USER, e.message, frame)
             );
 
             frame.status = STATUS.VISIT_NODE_CHILDREN;
-            stack.push(frame);
           }
         } else {
           frame.status = STATUS.VISIT_NODE_CHILDREN;
-          stack.push(frame);
         }
         break;
       }
@@ -91,32 +78,26 @@ const process = (
 
         // Push children to stack for processing
         if (currentChild) {
-          // Prepare parent frame and add to stack
+          // Prepare parent frame
           frame.status = STATUS.VISIT_NODE_CHILDREN;
-          stack.push(frame);
 
           const { value } = currentChild;
           if (isNode(value)) {
-            stack.push(
-              createFrame({
-                status: STATUS.PRE_MAP_CHECK,
-                parent: frame,
-                node: value,
-              })
-            );
+            frame = createFrame({
+              status: STATUS.PRE_MAP_CHECK,
+              parent: frame,
+              node: value,
+            });
           } else if (value !== null && value !== undefined) {
-            stack.push(
-              createFrame({
-                status: STATUS.REPORT_TO_PARENT,
-                parent: frame,
-                node: createNode("_", createNode(value)),
-              })
-            );
+            frame = createFrame({
+              status: STATUS.REPORT_TO_PARENT,
+              parent: frame,
+              node: createNode("_", createNode(value)),
+            });
           }
         } else {
-          // Prepare parent frame and add to stack
+          // Prepare parent frame
           frame.status = STATUS.COMBINE_PROCESSED_CHILDREN;
-          stack.push(frame);
         }
 
         break;
@@ -132,7 +113,6 @@ const process = (
             Object.assign(frame.parent.scope || {}, frame.scope || {});
         }
 
-        stack.push(frame);
         break;
       }
       case STATUS.POST_MAP_CHECK: {
@@ -161,25 +141,21 @@ const process = (
               );
             }
 
-            stack.push(
-              createFrame({
-                status: STATUS.PRE_MAP_CHECK,
-                parent: frame.parent,
-                node: result.node,
-                scope: result.innerScope,
-              })
-            );
+            frame = createFrame({
+              status: STATUS.PRE_MAP_CHECK,
+              parent: frame.parent,
+              node: result.node,
+              scope: result.innerScope,
+            });
           } catch (e) {
             console.error(
               createErrorMessage(ERROR_TYPES.USER, e.message, frame)
             );
 
             frame.status = STATUS.REPORT_TO_PARENT;
-            stack.push(frame);
           }
         } else {
           frame.status = STATUS.REPORT_TO_PARENT;
-          stack.push(frame);
         }
 
         break;
@@ -197,7 +173,12 @@ const process = (
           frame.parent.currentProcessedChild =
             frame.parent.currentProcessedChild.next;
         }
+
+        frame = frame.parent;
         break;
+      }
+      default: {
+        frame = frame.parent;
       }
     }
   }

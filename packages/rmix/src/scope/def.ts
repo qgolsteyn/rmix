@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { def as defAPI, namespace, rmixNode } from "../api";
+import { createNode } from "../api/rmixNode";
 import { RmixDefinition, RmixDefinitionFunction, RmixNode } from "../types";
 
 const defFunction = (type: "pre" | "post"): RmixDefinitionFunction => (
@@ -51,7 +52,7 @@ const def: Record<string, RmixDefinition> = {
       pre: defFunction("post"),
     },
   }),
-  apply: defAPI.post((tail) => rmixNode.createNode("_", tail)),
+  apply: defAPI.post((tail) => tail || createNode("_")),
 };
 
 export default def;

@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "yargs": "^16.2.0",
-    "rmix": "*",
-    "rmix-node": "*"
+    "rmix": "*"
   }
 }
